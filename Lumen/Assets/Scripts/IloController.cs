@@ -46,9 +46,14 @@ public class IloController : MonoBehaviour {
 			//on-surface movement
 			rigidbody.velocity = input*runSpeed*transform.right.normalized; 
 					
-			if(Input.GetButtonDown("Jump")) {
+			if(Input.GetButtonDown("Jump"))
+				{
 				onSurface = false;
 				Vector3 leanDirection = input * transform.right;
+				if(Physics.Raycast(transform.position, -transform.right, transform.localScale.y*0.5f) ||
+				Physics.Raycast(transform.position, transform.right, transform.localScale.y*0.5f)) {
+					leanDirection = Vector3.zero;	
+				}
 				surfaceNormal += leanDirection;
 				
 				//configure Jump
