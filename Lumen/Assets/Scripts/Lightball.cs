@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class Lightball : MonoBehaviour {
+public class LightBall : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {

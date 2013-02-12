@@ -43,6 +43,7 @@ public class IloController : MonoBehaviour {
 			}
 			transform.eulerAngles = new Vector3(0,0,transform.eulerAngles.z);
 			float input = Input.GetAxis("Horizontal");
+			//on-surface movement
 			rigidbody.velocity = input*runSpeed*transform.right.normalized; 
 					
 			if(Input.GetButtonDown("Jump")) {
