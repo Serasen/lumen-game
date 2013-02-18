@@ -11,14 +11,10 @@ public class IloController : MonoBehaviour {
 
 
 	// Use this for initialization
-	void Start () {
+	void OnEnable () {
 		onSurface = true;
 		midJump = false;
-		surfaceNormal = Vector3.up;
-	}
-	
-	void FixedUpdate() {
-		 //rigidbody.AddRelativeForce(Vector3.down*1000);
+		surfaceNormal = transform.up;
 	}
 	
 	float input;

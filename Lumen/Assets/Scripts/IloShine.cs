@@ -7,21 +7,30 @@ public class IloShine : MonoBehaviour {
 	public float maxIntensity;
 	int shine;
 	
+	Room myRoom;
 	float intensityStep;
 	
 	Light iloLight;
 	
 	void Awake() {
-		shine = maxShine;
 		iloLight = gameObject.GetComponentInChildren<Light>();
 		intensityStep = 1/30f;
-		iloLight.intensity = maxIntensity;
 	}
 	
 	// Use this for initialization
-	void Start () {
-		InvokeRepeating("LoseShine",0,1);
-		InvokeRepeating("FadeDark",0,intensityStep);
+	void OnEnable () {
+		shine = maxShine;
+		iloLight.intensity = maxIntensity;
+		InvokeRepeating("LoseShine",1,1);
+		InvokeRepeating("FadeDark", 1,intensityStep);
+	}
+	
+	void OnDisable() {
+		CancelInvoke();	
+	}
+	
+	bool IsAlive() {
+		return (shine > 0);
 	}
 	
 	#region lose shine
@@ -30,14 +39,15 @@ public class IloShine : MonoBehaviour {
 			iloLight.intensity -= intensityStep*maxIntensity/maxShine;
 		}
 		else {
-			CancelInvoke("FadeDark");	
+			CancelInvoke("FadeDark");
 		}
 	}
 	
 	void LoseShine() {
 		shine--;
 		if(!IsAlive()) {
-			CancelInvoke("LoseShine");
+			CancelInvoke();
+			transform.parent.GetComponent<Room>().reEnterRoom();
 		}	
 	}
 	#endregion
@@ -59,7 +69,7 @@ public class IloShine : MonoBehaviour {
 	
 	void FadeLight() {
 		float currentDistance = maxDistanceToCenter - (shineZoneCenter - transform.position).magnitude;
-		float calcShine = startShine + currentDistance*(maxShine - startShine)/maxDistanceToCenter;
+		float calcShine = Mathf.Ceil(startShine + currentDistance*(maxShine - startShine)/maxDistanceToCenter);
 		calcShine = Mathf.Clamp(calcShine, shine, maxShine);
 		if(calcShine > shine) {
 			shine = (int) calcShine;
@@ -71,12 +81,19 @@ public class IloShine : MonoBehaviour {
 	public void EndFadeLight() {
 		CancelInvoke();
 		float waitForIntensity = iloLight.intensity-maxIntensity*shine/maxShine;
-		InvokeRepeating("LoseShine",waitForIntensity,1);
-		InvokeRepeating("FadeDark",0,intensityStep);
+		if(waitForIntensity > 0) {
+			InvokeRepeating("LoseShine",1 + waitForIntensity,1);
+			InvokeRepeating("FadeDark",1,intensityStep);
+		}
+		else {
+			InvokeRepeating("LoseShine", 1,1);
+			InvokeRepeating("FadeDark", 1 + waitForIntensity,intensityStep);			
+		}
 	}
 	#endregion
-
-	bool IsAlive() {
-		return (shine > 0);
+	
+	void OnGUI() {
+		GUI.Box(new Rect(0, 0, 50, 50), "Shine\n" + shine);
+			
 	}
 }
