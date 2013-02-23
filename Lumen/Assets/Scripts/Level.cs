@@ -38,7 +38,6 @@ public class Level : MonoBehaviour {
 	public void changeRoom(int keyhole) {
 		foreach(RoomToRoomMapping mapping in roomToRoomMappings) {
 			if(mapping.sourceRoom == roomNumber && mapping.sourceKeyhole == keyhole) {
-				Debug.Log(mapping.destRoom + " is dest!");
 				roomNumber = mapping.destRoom;
 				roomInstances[roomNumber].GetComponent<Room>().enterRoom(mapping.destSpawnPoint);
 				break;
