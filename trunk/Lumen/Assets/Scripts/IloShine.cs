@@ -70,12 +70,14 @@ public class IloShine : MonoBehaviour {
 	void FadeLight() {
 		float currentDistance = maxDistanceToCenter - (shineZoneCenter - transform.position).magnitude;
 		float calcShine = Mathf.Ceil(startShine + currentDistance*(maxShine - startShine)/maxDistanceToCenter);
-		calcShine = Mathf.Clamp(calcShine, shine, maxShine);
-		if(calcShine > shine) {
+		float calcIntensity = startIntensity + currentDistance*(maxIntensity - startIntensity)/maxDistanceToCenter;
+		shine = Mathf.Clamp((int) calcShine, shine, maxShine);
+		iloLight.intensity = Mathf.Clamp(calcIntensity, iloLight.intensity, maxIntensity);
+	/*	if(calcShine >= shine) {
 			shine = (int) calcShine;
 			iloLight.intensity = startIntensity + currentDistance*(maxIntensity - startIntensity)/maxDistanceToCenter;
 			iloLight.intensity = Mathf.Clamp(iloLight.intensity, 0, maxIntensity);
-		}
+		} */
 	}
 	
 	public void EndFadeLight() {

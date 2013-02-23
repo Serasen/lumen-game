@@ -7,37 +7,46 @@ public class IloController : MonoBehaviour {
 	bool midJump;
 	
 	Vector3 surfaceNormal; //normal of surface currently occupied
-	Vector3 myNormal; //normal of player before correction to surface
-
-
-	// Use this for initialization
-	void OnEnable () {
-		onSurface = true;
-		midJump = false;
-		surfaceNormal = transform.up;
-	}
+	Vector3 jumpVector;
 	
+		
 	float input;
-	Vector3 jumpDirection;
-	
+	bool reverseInput;
 	
 	public float runSpeed;
 	public float jumpSpeed;
 	
 	//If angle of surface to descend is greater than this, slide off
-	public float maxDescendingSurface;
+	const float maxDescentAngle = 60f;
+	//cannot jump up to a surface angle this close to original surface
+	const float minTransferAngle = 15f;
+
+	// Use this for initialization
+	void OnEnable () {
+		onSurface = true;
+		midJump = false;
+		reverseInput = false;
+		
+		surfaceNormal = transform.up;
+		jumpVector = -transform.up;
+	}
+
 	
 	// Update is called once per frame
 	void Update () {
 		RaycastHit hit;
 		input = Input.GetAxis("Horizontal");
+		if(input == 0) {
+			reverseInput = Vector3.Angle(transform.up, Vector3.up) > 95f;
+		}
+		
 		if(onSurface) {
-			if(Physics.Raycast(transform.position, -surfaceNormal, out hit, transform.localScale.y) &&
-				Vector3.Angle(surfaceNormal, hit.normal) < maxDescendingSurface) 
+			if(Physics.Raycast(transform.position, -surfaceNormal, out hit, transform.localScale.y*2) &&
+				Vector3.Angle(surfaceNormal, hit.normal) < maxDescentAngle) 
 			{
+				Debug.Log("hit surface!");
 				surfaceNormal = hit.normal;
-				myNormal = Vector3.Lerp(myNormal, surfaceNormal, 10*Time.deltaTime);
-				transform.up = myNormal;
+				transform.up = Vector3.Lerp(transform.up, surfaceNormal, 10*Time.deltaTime);
 				
 				//Hold player to surface	
 				transform.position = hit.point + surfaceNormal*transform.localScale.y*0.5f;
@@ -48,9 +57,8 @@ public class IloController : MonoBehaviour {
 			
 			transform.eulerAngles = new Vector3(0,0,transform.eulerAngles.z);
 			transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
-	//		input = Input.GetAxis("Horizontal");
-			rigidbody.velocity = input*runSpeed*transform.right.normalized;
 			
+			rigidbody.velocity = input*runSpeed*(reverseInput ? -1 : 1)*transform.right.normalized;
 			//on-surface movement
 					
 			if(Input.GetButtonDown("Jump"))
@@ -59,19 +67,9 @@ public class IloController : MonoBehaviour {
 			}
 		}
 		else {
-			rigidbody.velocity += input*transform.right.normalized;
-			if(midJump) {
-				if(Physics.Raycast(transform.position, surfaceNormal, out hit, transform.localScale.y)) 
-				{
-					surfaceNormal = hit.normal;
-					onSurface = true;
-					midJump = false;
-				}
-			}
-			else {
-				if(rigidbody.velocity.magnitude < jumpSpeed) {
-					rigidbody.AddForce(-surfaceNormal*jumpSpeed, ForceMode.Acceleration);
-				}
+			rigidbody.velocity += input*(reverseInput ? -1 : 1)*transform.right.normalized;
+			if(!midJump && rigidbody.velocity.magnitude < jumpSpeed) {
+				rigidbody.AddForce(-surfaceNormal.normalized*jumpSpeed, ForceMode.Acceleration);
 			}
 		}	
 	}
@@ -79,9 +77,17 @@ public class IloController : MonoBehaviour {
 	void OnCollisionEnter(Collision collision) {
 		if(!onSurface ) {
 			ContactPoint contact = collision.contacts[0];
-			if(!(midJump && Vector3.Angle(contact.normal, transform.up) < 15f)) {
-				transform.rotation = Quaternion.FromToRotation(Vector3.up, contact.normal);
-				surfaceNormal = contact.normal;
+			RaycastHit hit;
+			if(!(midJump && Vector3.Angle(contact.normal, transform.up) < minTransferAngle) &&
+				Physics.Raycast(transform.position, -contact.normal, out hit)) 
+			{
+				Vector3 contactNormal = hit.normal;
+					
+				if(Vector3.Angle(surfaceNormal, contactNormal) > 150f) reverseInput = !reverseInput;
+				
+				surfaceNormal = contactNormal;
+				
+				transform.rotation = Quaternion.FromToRotation(Vector3.up, surfaceNormal);
 				onSurface = true;
 				midJump = false;
 			}
@@ -94,22 +100,12 @@ public class IloController : MonoBehaviour {
 	void initiateJump() {
 		onSurface = false;
 		midJump = true;
-		Vector3 leanDirection = input * transform.right;
-		if(isOnWall()) {
+		Vector3 leanDirection = input * (reverseInput ? -1 : 1) * transform.right;
+		if(Physics.Raycast(transform.position, leanDirection, transform.localScale.y)) {
 			leanDirection = Vector3.zero;	
 		}
-		surfaceNormal += leanDirection;
-		
-		RaycastHit hit;
-		//configure Jump
-		if(Physics.Raycast(transform.position, surfaceNormal, out hit)) {
-			jumpDirection = hit.point - transform.position;
-			rigidbody.velocity = jumpDirection.normalized*jumpSpeed;
-		}
-		else {
-			//jump into space
-			rigidbody.velocity = (surfaceNormal + leanDirection).normalized*jumpSpeed;
-		}
+		jumpVector = (surfaceNormal + leanDirection).normalized*jumpSpeed;
+		rigidbody.velocity = jumpVector;
 	}
 	
 	bool isOnWall() {
