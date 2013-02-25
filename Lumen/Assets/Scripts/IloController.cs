@@ -44,7 +44,7 @@ public class IloController : MonoBehaviour {
 			if(Physics.Raycast(transform.position, -surfaceNormal, out hit, transform.localScale.y*2) &&
 				Vector3.Angle(surfaceNormal, hit.normal) < maxDescentAngle) 
 			{
-				Debug.Log("hit surface!");
+				//Debug.Log("hit surface!");
 				surfaceNormal = hit.normal;
 				transform.up = Vector3.Lerp(transform.up, surfaceNormal, 10*Time.deltaTime);
 				
