@@ -5,7 +5,8 @@ public class Waypoint : MonoBehaviour {
 	PathFinder pf;
 	// Use this for initialization
 	void Start () {
-		pf = transform.parent.GetComponent<PathFinder>();
+		pf = null;
+	//	pf = transform.parent.GetComponent<PathFinder>();
 	}
 	
 	// Update is called once per frame
@@ -14,8 +15,12 @@ public class Waypoint : MonoBehaviour {
 	}
 	
 	void OnTriggerEnter(Collider c) {
-		if(c.gameObject.tag.Equals("Player"))
+		if(c.gameObject.tag.Equals("Player")) {
+			if(pf == null) {
+				pf = transform.parent.GetComponent<PathFinder>(); 	
+			}
 			pf.SetIloAt(transform);
+		}
 		else if (c.gameObject.tag == "DarkCrawler")
 			c.gameObject.GetComponent<DarkCrawler>().UpdateWaypoint(transform);
 	}
