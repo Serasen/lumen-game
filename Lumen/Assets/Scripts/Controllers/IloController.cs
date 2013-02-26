@@ -66,11 +66,8 @@ public class IloController : MonoBehaviour {
 			if(Physics.Raycast(transform.position, -surfaceNormal, out hit, transform.localScale.y*2) &&
 				Vector3.Angle(surfaceNormal, hit.normal) < maxDescentAngle) 
 			{
-				//Debug.Log("hit surface!");
 				surfaceNormal = hit.normal;
-				transform.up = Vector3.Lerp(transform.up, surfaceNormal, 10*Time.deltaTime);
-				
-				//Hold player to surface	
+				transform.up = Vector3.Lerp(transform.up, surfaceNormal, 10*Time.deltaTime);	
 				transform.position = hit.point + surfaceNormal*transform.localScale.y*0.5f;
 			}
 			else {
@@ -95,6 +92,7 @@ public class IloController : MonoBehaviour {
 			if(!midJump && rigidbody.velocity.magnitude < jumpSpeed) {
 				rigidbody.AddForce(-surfaceNormal.normalized*jumpSpeed, ForceMode.Acceleration);
 			}
+			jumpVector = rigidbody.velocity;
 		}	
 	}
 	
@@ -103,27 +101,36 @@ public class IloController : MonoBehaviour {
 		if(!onSurface ) {
 			ContactPoint contact = collision.contacts[0];
 			
-			if(Physics.Raycast(transform.position, (contact.point - transform.position), out hit) &&
-				!(midJump && Vector3.Angle(hit.normal, transform.up) < minTransferAngle)) 
+			if(!(midJump && Vector3.Angle(contact.normal, transform.up) < minTransferAngle)) 
 			{
-				Vector3 contactNormal = hit.normal;
-				if(Vector3.Angle(surfaceNormal, contactNormal) > 150f) {
-					reverseHorizontalInput = !reverseHorizontalInput;
-					reverseVerticalInput = !reverseVerticalInput;
+				if(Physics.Raycast(transform.position, (contact.point - transform.position), out hit)) {
+					if(collision.gameObject.tag != "Mirror") {
+						Vector3 contactNormal = hit.normal;
+						if(Vector3.Angle(surfaceNormal, contactNormal) > 150f) {
+							reverseHorizontalInput = !reverseHorizontalInput;
+							reverseVerticalInput = !reverseVerticalInput;
+						}
+				
+						surfaceNormal = contactNormal;
+				
+						transform.rotation = Quaternion.FromToRotation(Vector3.up, surfaceNormal);
+				
+						if(!midJump) {
+							reverseHorizontalInput = Vector3.Angle(transform.up, Vector3.up) > 95f;
+							reverseVerticalInput = transform.right.y < 0;
+						}
+				
+						onSurface = true;
+						midJump = false;
+						jumpFromWall = false;
+					}
+					else {	
+						//momentarily on surface, for camera
+						onSurface = true;
+						surfaceNormal = hit.normal;
+						initiateReflect();
+					}
 				}
-				
-				surfaceNormal = contactNormal;
-				
-				transform.rotation = Quaternion.FromToRotation(Vector3.up, surfaceNormal);
-				
-				if(!midJump) {
-					reverseHorizontalInput = Vector3.Angle(transform.up, Vector3.up) > 95f;
-					reverseVerticalInput = transform.right.y < 0;
-				}
-				
-				onSurface = true;
-				midJump = false;
-				jumpFromWall = false;
 				
 			}
 		}
@@ -136,7 +143,7 @@ public class IloController : MonoBehaviour {
 		}
 	}
 	
-	void initiateJump() {
+	public void initiateJump() {
 		onSurface = false;
 		midJump = true;
 		Vector3 leanDirection = GetInput() * transform.right;
@@ -145,5 +152,21 @@ public class IloController : MonoBehaviour {
 		}
 		jumpVector = (surfaceNormal + (jumpFromWall ? Vector3.zero : leanDirection)).normalized*jumpSpeed;
 		rigidbody.velocity = jumpVector;
-	} 
+	}
+	
+	public void initiateReflect() {
+		reverseHorizontalInput = false;
+		reverseVerticalInput = false;
+						
+			onSurface = false;
+		midJump = true;
+		transform.up = surfaceNormal;
+		jumpVector = Vector3.Reflect(-jumpVector, transform.right).normalized*jumpSpeed;
+						
+		rigidbody.velocity = jumpVector;
+	}
+	
+	public bool isJumping() {
+		return midJump;
+	}
 }

@@ -26,7 +26,8 @@ public class IloShine : MonoBehaviour {
 	}
 	
 	void OnDisable() {
-		CancelInvoke();	
+		Debug.Log("Disabled!");
+		CancelInvoke();
 	}
 	
 	bool IsAlive() {
