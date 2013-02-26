@@ -7,6 +7,14 @@ public class LevelManager : MonoBehaviour {
 	int levelNumber;
 	GameObject currentLevel;
 	
+	public GameObject iloPrefab;
+	
+	GameObject iloInstance;
+	
+	void Awake () {
+		iloInstance = (GameObject) Instantiate(iloPrefab);
+	}
+	
 	void Start () {
 		levelNumber = 0;
 		currentLevel = (GameObject) GameObject.Instantiate(levels[levelNumber]);
@@ -20,5 +28,9 @@ public class LevelManager : MonoBehaviour {
 			currentLevel = (GameObject) GameObject.Instantiate(levels[levelNumber]);
 			currentLevel.transform.parent = transform;
 		}
+	}
+	
+	public GameObject getIloInstance() {
+		return iloInstance;
 	}
 }
