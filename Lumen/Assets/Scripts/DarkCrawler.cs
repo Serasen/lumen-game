@@ -8,8 +8,6 @@ public class DarkCrawler : MonoBehaviour {
 	private int waypoint = -1;
 	private PathFinder pf;
 	private Transform lastWaypoint;
-	Transform Ilo;
-	GameObject waypoints;
 	Room myRoom;
 	
 	// Use this for initialization
@@ -20,13 +18,12 @@ public class DarkCrawler : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		//ChooseDirection(); //direction = Ilo.position.x > transform.position.x - 1 ? 1 : -1;
 		if(pf.GetIloAt() > waypoint)
 			direction = 1;
 		else if(pf.GetIloAt() < waypoint)
 			direction = -1;
 		if(!midair)
-			rigidbody.velocity = direction*speed*transform.right;//.normalized;// - transform.up*15f;
+			rigidbody.velocity = direction*speed*transform.right;
 	}
 	
 	void OnCollisionEnter(Collision collision) {
@@ -49,20 +46,6 @@ public class DarkCrawler : MonoBehaviour {
 	
 	void OnCollisionStay() {
 		midair = false;
-	}
-	
-	private void ChooseDirection() {
-		Vector3 ilopos = Ilo.position, mypos = transform.position;
-		bool rightisup = transform.right.normalized.y > .5;
-		bool leftisup = transform.right.normalized.y < -.5;
-		if(ilopos.x > mypos.x + 5 ||
-			rightisup && ilopos.y > mypos.y ||
-			leftisup && ilopos.y < mypos.y)
-				direction = 1;
-		else if(ilopos.x < mypos.x -5 ||
-			rightisup && ilopos.y < mypos.y ||
-			leftisup && ilopos.y > mypos.y)
-				direction = -1;
 	}
 	
 	public void UpdateWaypoint(Transform t) {
