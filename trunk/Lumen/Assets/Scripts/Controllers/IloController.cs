@@ -169,4 +169,8 @@ public class IloController : MonoBehaviour {
 	public bool isJumping() {
 		return midJump;
 	}
+	
+	public bool isMoving() {
+		return (input != 0);
+	}
 }

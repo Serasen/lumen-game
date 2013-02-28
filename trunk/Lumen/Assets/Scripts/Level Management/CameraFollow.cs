@@ -4,7 +4,8 @@ using System.Collections;
 public class CameraFollow : MonoBehaviour {
 	Room myRoom;
 	GameObject ilo;
-	public float followDelay;
+	public float followSpeed;
+	public bool expandCamera;
 	float initialSize;
 	IloController controller;
 	
@@ -15,23 +16,17 @@ public class CameraFollow : MonoBehaviour {
 		myRoom = transform.parent.GetComponent<Room>();
 		ilo = myRoom.getIloInstance();
 		controller = ilo.GetComponent<IloController>();		
-		initialSize = camera.orthographicSize;
-		InvokeRepeating("AdjustCameraSize",0, 1/60f);
+		OnEnable();
 	}
 	
 	void OnEnable() {
 		if(ilo) {
-			Vector3 spawnPosition = myRoom.getLatestSpawnPoint().transform.position;
-			transform.position = new Vector3(spawnPosition.x,spawnPosition.y, transform.position.z);
-			
 			initialSize = camera.orthographicSize;
-			InvokeRepeating("AdjustCameraSize",0, 1/60f);
+			if(expandCamera) InvokeRepeating("AdjustCameraSize",0, 1/60f);
 		}
 	}
 	
 	void OnDisable() {
-		if(myRoom) {
-		}
 		CancelInvoke();	
 	}
 	
@@ -40,35 +35,35 @@ public class CameraFollow : MonoBehaviour {
 		myPosition = transform.position;
 		iloPosition = ilo.transform.position;
 		Vector3 desiredPosition = new Vector3(iloPosition.x,iloPosition.y, myPosition.z);
-		transform.position = Vector3.Lerp(myPosition, desiredPosition, Time.deltaTime*followDelay);
+		transform.position = Vector3.Lerp(myPosition, desiredPosition, Time.deltaTime*followSpeed);
 	}
 	
 	void AdjustCameraSize() {
-		if(controller.isJumping()) {
-			Invoke("IncreaseCameraSize", 1f);
+		if(controller.isJumping() && camera.orthographicSize < initialSize*2) {
+			CancelInvoke();
+			InvokeRepeating("IncreaseCameraSize", 1f, 1/60f);
 		}
-		else {
-			CancelInvoke("IncreaseCameraSize");
-			
-			if(camera.orthographicSize != initialSize) {
-				CancelInvoke("AdjustCameraSize");
-				InvokeRepeating("ResetCameraSize", 0, 1/60f);
-			}
+		else  {
+			Invoke("ResetCameraSize", 0);
 		}
 	}
 	
 	void IncreaseCameraSize() {
+		if(controller.isJumping() && camera.orthographicSize < initialSize*2) {
 			camera.orthographicSize += 0.1f;
+		}
+		else {
+			CancelInvoke();
+			InvokeRepeating("AdjustCameraSize", 0, 1/60f);
+		}
 	}
 	
 	void ResetCameraSize() {
 		if(camera.orthographicSize > initialSize) {
-			camera.orthographicSize -= 0.2f;	
+			camera.orthographicSize -= 0.1f;
 		}
 		else {
-			CancelInvoke();
-			camera.orthographicSize = initialSize;
-			InvokeRepeating("AdjustCameraSize", 0, 1/60f);
+			CancelInvoke("ResetCameraSize");	
 		}
 	}
 }

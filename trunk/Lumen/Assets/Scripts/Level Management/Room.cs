@@ -3,18 +3,17 @@ using System.Collections;
 
 public class Room : MonoBehaviour {
 	
-	public GameObject[] spawnPoints;
+	public SpawnPoint[] spawnPoints;
 	public GameObject[] keyholes;
 	
+	[System.Serializable]
 	public class SpawnPoint {
 		public GameObject spawnPoint;
 		public GameObject cameraStartPosition;
-		public void placeAt() {
-		}
 	}
 	
+	public GameObject mainCamera;
 	
-	public GameObject iloPrefab;
 	GameObject iloInstance;
 	
 	Level myLevel;
@@ -35,7 +34,9 @@ public class Room : MonoBehaviour {
 	}
 	
 	public void enterRoom(int point) {
-		Transform spawn = spawnPoints[point].transform;
+		Transform spawn = spawnPoints[point].spawnPoint.transform;
+		Vector3 cameraPoint = spawnPoints[point].cameraStartPosition.transform.position;
+		
 		if(iloInstance == null) {
 			myLevel = transform.parent.GetComponent<Level>();
 			iloInstance = myLevel.getIloInstance();
@@ -44,6 +45,7 @@ public class Room : MonoBehaviour {
 		iloInstance.transform.position = spawn.position;
 		iloInstance.transform.rotation = spawn.rotation;		
 		iloInstance.transform.parent = this.transform;
+		mainCamera.transform.position = new Vector3(cameraPoint.x, cameraPoint.y, mainCamera.transform.position.z);
 		
 		latestSpawnPoint = point;
 		gameObject.SetActive(true);
@@ -58,7 +60,7 @@ public class Room : MonoBehaviour {
 		return iloInstance;
 	}
 	
-	public GameObject getLatestSpawnPoint() {
+	/*public GameObject getLatestSpawnPoint() {
 		return spawnPoints[latestSpawnPoint];
-	}
+	}*/
 }
