@@ -56,11 +56,11 @@ public class Room : MonoBehaviour {
 		myLevel.changeRoom(keyhole);
 	}
 	
+	public void reachedLevelEndKeyhole(int keyhole) {
+		
+	}
+	
 	public GameObject getIloInstance() {
 		return iloInstance;
 	}
-	
-	/*public GameObject getLatestSpawnPoint() {
-		return spawnPoints[latestSpawnPoint];
-	}*/
 }

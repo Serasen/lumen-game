@@ -2,8 +2,9 @@ using UnityEngine;
 using System.Collections;
 
 public class Keyhole : MonoBehaviour {
-	int keyholeNum;
-	Room myRoom;
+	public Texture2D texture;
+	protected int keyholeNum;
+	protected Room myRoom;
 	
 	void Start() {
 		myRoom = transform.parent.GetComponent<Room>();	
@@ -13,7 +14,7 @@ public class Keyhole : MonoBehaviour {
 		keyholeNum = num;	
 	}
 	
-	void OnTriggerEnter(Collider collider) {
+	protected virtual void OnTriggerEnter(Collider collider) {
 		if(collider.tag == "Player") {
 			myRoom.reachedKeyhole(keyholeNum);
 		}

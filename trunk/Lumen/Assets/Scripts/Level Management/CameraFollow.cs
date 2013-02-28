@@ -20,13 +20,14 @@ public class CameraFollow : MonoBehaviour {
 	}
 	
 	void OnEnable() {
+		initialSize = camera.orthographicSize;
 		if(ilo) {
-			initialSize = camera.orthographicSize;
 			if(expandCamera) InvokeRepeating("AdjustCameraSize",0, 1/60f);
 		}
 	}
 	
 	void OnDisable() {
+		camera.orthographicSize = initialSize;
 		CancelInvoke();	
 	}
 	
