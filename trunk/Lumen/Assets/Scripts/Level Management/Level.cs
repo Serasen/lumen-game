@@ -3,11 +3,11 @@ using System.Collections;
 
 public class Level : MonoBehaviour {
 	
-	LevelManager levelManager;
-	GameObject iloInstance;
+	protected LevelManager levelManager;
+	protected GameObject iloInstance;
 	
 	public RoomInfo[] rooms;
-	GameObject[] roomInstances;
+	protected GameObject[] roomInstances;
 	
 	[System.Serializable]
 	public class RoomInfo {
@@ -24,27 +24,19 @@ public class Level : MonoBehaviour {
 	int roomNumber;
 	GameObject currentRoom;
 	
-	void Awake () {
+	protected void Awake () {
 		roomInstances = new GameObject[rooms.Length];
-		for(int i = 0; i < rooms.Length; ++i) {
-			roomInstances[i] = (GameObject) GameObject.Instantiate(rooms[i].room);
-			roomInstances[i].transform.parent = transform;
-			roomInstances[i].SetActive(false);
-		}
 	}
 	
-	void Start() {
+	protected virtual void Start() {
 		levelManager = transform.parent.GetComponent<LevelManager>();
 		iloInstance = levelManager.getIloInstance();
 		OnEnable();
 	}
 	
-	void OnEnable() {
+	protected virtual void OnEnable() {
 		if(iloInstance) {
-			roomNumber = 0;
-			currentRoom = roomInstances[roomNumber];
-			currentRoom.SetActive(true);
-			roomInstances[roomNumber].GetComponent<Room>().enterRoom(0);
+			setCurrentRoom(0, 0);
 		}
 	}
 	
@@ -52,17 +44,25 @@ public class Level : MonoBehaviour {
 		RoomMapping mapping = rooms[roomNumber].mappings[keyhole];
 		for(int i = 0; i < rooms.Length; i++) {
 			if(rooms[i].room == mapping.destRoom) {
-				roomNumber = i;
-				currentRoom = mapping.destRoom;
-				roomInstances[roomNumber].GetComponent<Room>().enterRoom(mapping.destSpawnPoint);
+				setCurrentRoom(i, mapping.destSpawnPoint);
 				break;
 			}
 		}
 	}
 	
-	public void changeLevel(int levelToEnter) {
-		roomNumber = 0;
-		currentRoom = null;
+	public void setCurrentRoom(int number, int spawnPoint) {
+		roomNumber = number;
+		if(roomInstances[roomNumber] == null) {
+			roomInstances[roomNumber] = (GameObject) GameObject.Instantiate(rooms[roomNumber].room);
+			roomInstances[roomNumber].transform.parent = transform;
+			roomInstances[roomNumber].SetActive(false);
+		}
+		currentRoom = roomInstances[roomNumber];
+		roomInstances[roomNumber].GetComponent<Room>().enterRoom(spawnPoint);		
+	}
+	
+	//Leave a particular level
+	public virtual void changeLevel(int levelToEnter) {
 		levelManager.changeLevel(levelToEnter);
 	}
 	
