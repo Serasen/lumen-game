@@ -37,10 +37,6 @@ public class Level : MonoBehaviour {
 		levelManager = transform.parent.GetComponent<LevelManager>();
 		iloInstance = levelManager.getIloInstance();
 		OnEnable();
-		/*roomNumber = 0;
-		currentRoom = roomInstances[roomNumber];
-		currentRoom.SetActive(true);
-		roomInstances[roomNumber].GetComponent<Room>().enterRoom(0);*/
 	}
 	
 	void OnEnable() {
