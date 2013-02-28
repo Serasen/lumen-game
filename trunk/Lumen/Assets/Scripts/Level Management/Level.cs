@@ -17,7 +17,7 @@ public class Level : MonoBehaviour {
 	
 	[System.Serializable]
 	public class RoomMapping {
-		public int destRoom;
+		public GameObject destRoom;
 		public int destSpawnPoint;
 	}
 	
@@ -50,8 +50,14 @@ public class Level : MonoBehaviour {
 	
 	public void changeRoom(int keyhole) {
 		RoomMapping mapping = rooms[roomNumber].mappings[keyhole];
-		roomNumber = mapping.destRoom;
-		roomInstances[roomNumber].GetComponent<Room>().enterRoom(mapping.destSpawnPoint);
+		for(int i = 0; i < rooms.Length; i++) {
+			if(rooms[i].room == mapping.destRoom) {
+				roomNumber = i;
+				currentRoom = mapping.destRoom;
+				roomInstances[roomNumber].GetComponent<Room>().enterRoom(mapping.destSpawnPoint);
+				break;
+			}
+		}
 	}
 	
 	public GameObject getIloInstance() {
