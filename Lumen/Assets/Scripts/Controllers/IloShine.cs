@@ -26,7 +26,6 @@ public class IloShine : MonoBehaviour {
 	}
 	
 	void OnDisable() {
-		Debug.Log("Disabled!");
 		CancelInvoke();
 	}
 	
@@ -95,8 +94,8 @@ public class IloShine : MonoBehaviour {
 	}
 	#endregion
 	
-	void OnGUI() {
+	/*void OnGUI() {
 		GUI.Box(new Rect(0, 0, 50, 50), "Shine\n" + shine);
 			
-	}
+	}*/
 }
