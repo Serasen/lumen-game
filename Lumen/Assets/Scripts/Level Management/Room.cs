@@ -45,7 +45,7 @@ public class Room : MonoBehaviour {
 		iloInstance.transform.position = spawn.position;
 		iloInstance.transform.rotation = spawn.rotation;		
 		iloInstance.transform.parent = this.transform;
-		mainCamera.transform.position = new Vector3(cameraPoint.x, cameraPoint.y, mainCamera.transform.position.z);
+		mainCamera.transform.position = new Vector3(spawn.position.x, spawn.position.y, mainCamera.transform.position.z);
 		
 		latestSpawnPoint = point;
 		gameObject.SetActive(true);
@@ -56,8 +56,10 @@ public class Room : MonoBehaviour {
 		myLevel.changeRoom(keyhole);
 	}
 	
-	public void reachedLevelEndKeyhole(int keyhole) {
-		
+	public void reachedLevelKeyhole(int levelToEnter) {
+		latestSpawnPoint = 0;
+		gameObject.SetActive(false);
+		myLevel.changeLevel(levelToEnter);
 	}
 	
 	public GameObject getIloInstance() {
