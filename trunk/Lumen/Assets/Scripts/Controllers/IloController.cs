@@ -35,7 +35,7 @@ public class IloController : MonoBehaviour {
 		
 	}
 	
-	float GetInput() {
+/*	float GetInput() {
 		float input;
 		float horizontalInput = Input.GetAxis("Horizontal");
 		float verticalInput = Input.GetAxis("Vertical");
@@ -48,6 +48,23 @@ public class IloController : MonoBehaviour {
 			else {
 				input = verticalInput * (reverseVerticalInput ? -1 : 1);
 			}
+		}
+		else {
+			input = horizontalInput * (reverseHorizontalInput ? -1 : 1);
+		}
+		return input;
+	} */
+	
+	float GetInput() {
+		float input;
+		float horizontalInput = Input.GetAxis("Horizontal");
+		float verticalInput = Input.GetAxis("Vertical");
+		if(verticalInput == 0) {
+			reverseVerticalInput = transform.right.y < 0;
+		}
+		if(horizontalInput == 0) {
+			reverseHorizontalInput = Vector3.Angle(transform.up, Vector3.up) > 95f;
+			input = verticalInput * (reverseVerticalInput ? -1 : 1);
 		}
 		else {
 			input = horizontalInput * (reverseHorizontalInput ? -1 : 1);
@@ -126,7 +143,6 @@ public class IloController : MonoBehaviour {
 					}
 					else {	
 						//momentarily on surface, for camera
-						onSurface = true;
 						surfaceNormal = hit.normal;
 						initiateReflect();
 					}
@@ -157,8 +173,9 @@ public class IloController : MonoBehaviour {
 	public void initiateReflect() {
 		reverseHorizontalInput = false;
 		reverseVerticalInput = false;
+		
 						
-			onSurface = false;
+		onSurface = false;
 		midJump = true;
 		transform.up = surfaceNormal;
 		jumpVector = Vector3.Reflect(-jumpVector, transform.right).normalized*jumpSpeed;

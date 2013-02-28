@@ -2,7 +2,6 @@ using UnityEngine;
 using System.Collections;
 
 public class Keyhole : MonoBehaviour {
-	public Texture2D texture;
 	protected int keyholeNum;
 	protected Room myRoom;
 	

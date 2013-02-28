@@ -3,9 +3,10 @@ using System.Collections;
 
 public class LevelManager : MonoBehaviour {
 	public GameObject[] levels;
+	GameObject[] levelInstances;
 	
-	int levelNumber;
 	GameObject currentLevel;
+	int levelNumber;
 	
 	public GameObject iloPrefab;
 	
@@ -16,18 +17,23 @@ public class LevelManager : MonoBehaviour {
 	}
 	
 	void Start () {
+		levelInstances = new GameObject[levels.Length];
 		levelNumber = 0;
-		currentLevel = (GameObject) GameObject.Instantiate(levels[levelNumber]);
-		currentLevel.transform.parent = transform;
+		changeLevel(0);
 	}
 	
-	public void changeLevel() {
-		GameObject.Destroy(currentLevel);
-		levelNumber++;
-		if(levelNumber < levels.Length) {
-			currentLevel = (GameObject) GameObject.Instantiate(levels[levelNumber]);
+	public void changeLevel(int level) {
+		if(currentLevel != null) currentLevel.SetActive(false);
+		levelNumber = level;
+		if(levelInstances[levelNumber] == null) {
+			currentLevel = (GameObject) GameObject.Instantiate(levels[levelNumber]); 
+			levelInstances[levelNumber] = currentLevel;
 			currentLevel.transform.parent = transform;
 		}
+		else {
+			currentLevel = levelInstances[levelNumber];
+		}
+		currentLevel.SetActive(true);
 	}
 	
 	public GameObject getIloInstance() {

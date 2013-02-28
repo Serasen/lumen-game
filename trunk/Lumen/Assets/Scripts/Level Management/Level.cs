@@ -60,6 +60,12 @@ public class Level : MonoBehaviour {
 		}
 	}
 	
+	public void changeLevel(int levelToEnter) {
+		roomNumber = 0;
+		currentRoom = null;
+		levelManager.changeLevel(levelToEnter);
+	}
+	
 	public GameObject getIloInstance() {
 		return iloInstance;
 	}
