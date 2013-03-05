@@ -7,6 +7,7 @@ public class LevelHub : Level {
 	int lastLevelEntered;
 	
 	protected override void Start() {
+		
 		for(int i = 0; i < rooms.Length; i++) {
 			if(rooms[i].room == hubRoom) {
 				hubRoomNum = i;
@@ -14,27 +15,21 @@ public class LevelHub : Level {
 			}
 		}
 
-		levelManager = transform.parent.GetComponent<LevelManager>();
+		levelManager = LevelManager.instance;
 		lastLevelEntered = 0;
-		iloInstance = levelManager.getIloInstance();
-		if(iloInstance) {
-			setCurrentRoom(0, 0);
-		}
+		setCurrentRoom(0, 0);
 	}
 	
 	//Not called on startup, but every time after
 	protected override void OnEnable() {
-		if(iloInstance) {
-			/* assumes keyhole 0 is from level hub
-			 * and keyholes 1-n are to levels
-			 * */
-			setCurrentRoom(hubRoomNum, lastLevelEntered);
-		}
+		/* assumes keyhole 0 is from level hub
+		 * and keyholes 1-n are to levels
+		 * */
+		setCurrentRoom(hubRoomNum, lastLevelEntered);
 	}
 	
 		//Leave a particular level
-	public override void changeLevel(int levelToEnter) {
+	public void setLevelEntered(int levelToEnter) {
 		lastLevelEntered = levelToEnter;
-		base.changeLevel(levelToEnter);
 	}
 }

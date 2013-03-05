@@ -4,7 +4,6 @@ using System.Collections;
 public class Level : MonoBehaviour {
 	
 	protected LevelManager levelManager;
-	protected GameObject iloInstance;
 	
 	public RoomInfo[] rooms;
 	protected GameObject[] roomInstances;
@@ -29,18 +28,16 @@ public class Level : MonoBehaviour {
 	}
 	
 	protected virtual void Start() {
-		levelManager = transform.parent.GetComponent<LevelManager>();
-		iloInstance = levelManager.getIloInstance();
-		OnEnable();
+		levelManager = LevelManager.instance;
+		//OnEnable();
 	}
 	
 	protected virtual void OnEnable() {
-		if(iloInstance) {
-			setCurrentRoom(0, 0);
-		}
+		setCurrentRoom(0, 0);
 	}
 	
 	public void changeRoom(int keyhole) {
+		//Debug.Log("startRoom: " + roomNumber + " length: " + rooms[roomNumber].mappings.Length + " keyhole: " + keyhole);
 		RoomMapping mapping = rooms[roomNumber].mappings[keyhole];
 		for(int i = 0; i < rooms.Length; i++) {
 			if(rooms[i].room == mapping.destRoom) {
@@ -52,21 +49,22 @@ public class Level : MonoBehaviour {
 	
 	public void setCurrentRoom(int number, int spawnPoint) {
 		roomNumber = number;
+		roomBehavior = null;
+		
 		if(roomInstances[roomNumber] == null) {
 			roomInstances[roomNumber] = (GameObject) GameObject.Instantiate(rooms[roomNumber].room);
 			roomInstances[roomNumber].transform.parent = transform;
 			roomInstances[roomNumber].SetActive(false);
 		}
 		currentRoom = roomInstances[roomNumber];
-		roomInstances[roomNumber].GetComponent<Room>().enterRoom(spawnPoint);		
+		getCurrentRoom().enterRoom(spawnPoint);		
 	}
 	
-	//Leave a particular level
-	public virtual void changeLevel(int levelToEnter) {
-		levelManager.changeLevel(levelToEnter);
-	}
-	
-	public GameObject getIloInstance() {
-		return iloInstance;
+	Room roomBehavior;
+	public Room getCurrentRoom() {
+		if(roomBehavior == null) {
+			roomBehavior = currentRoom.GetComponent<Room>();
+		}
+		return roomBehavior;
 	}
 }
