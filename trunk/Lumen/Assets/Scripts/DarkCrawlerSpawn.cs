@@ -3,6 +3,7 @@ using System.Collections;
 
 public class DarkCrawlerSpawn : MonoBehaviour {
 	public GameObject toSpawn;
+	public GameObject waypoints;
 	GameObject spawnInstance;
 	
 	// Use this for initialization
@@ -12,7 +13,7 @@ public class DarkCrawlerSpawn : MonoBehaviour {
 	void OnEnable() {
 		if(spawnInstance == null) {
 			spawnInstance = (GameObject) GameObject.Instantiate(toSpawn, transform.position, transform.rotation);
-			spawnInstance.transform.parent = transform.parent;
+			spawnInstance.transform.parent = transform;
 		}
 		else {
 			spawnInstance.transform.position = transform.position;

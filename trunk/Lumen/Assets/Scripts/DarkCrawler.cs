@@ -12,8 +12,7 @@ public class DarkCrawler : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		myRoom = transform.parent.GetComponent<Room>();
-		pf = GameObject.Find("Waypoints").GetComponent<PathFinder>();
+		pf = transform.parent.GetComponent<DarkCrawlerSpawn>().waypoints.GetComponent<PathFinder>();
 	}
 	
 	// Update is called once per frame
@@ -28,7 +27,7 @@ public class DarkCrawler : MonoBehaviour {
 	
 	void OnCollisionEnter(Collision collision) {
 		if(collision.gameObject.tag.Equals("Player"))
-			myRoom.reEnterRoom();
+			LevelManager.instance.getCurrentLevel().getCurrentRoom().reEnterRoom();
 	}
 	
 	void OnCollisionStay(Collision collision) {

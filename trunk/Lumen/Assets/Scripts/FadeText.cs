@@ -3,7 +3,7 @@ using System.Collections;
 
 public class FadeText : MonoBehaviour {
 	
-	Room myRoom;
+	Camera camera;
 	
 	float alphaValue;
 	
@@ -18,7 +18,7 @@ public class FadeText : MonoBehaviour {
 	}
 	
 	void Start() {
-		myRoom = transform.parent.GetComponent<Room>();
+		camera = LevelManager.instance.getCamera();
 		alphaValue = 0f;	
 	}
 	
@@ -40,7 +40,7 @@ public class FadeText : MonoBehaviour {
 		GUIStyle newStyle = new GUIStyle();
 		newStyle.alignment = TextAnchor.UpperCenter;
 		newStyle.normal.textColor = new Color(1,1,1,alphaValue);
-		Vector3 screenPoint = myRoom.mainCamera.camera.WorldToScreenPoint(transform.position);
+		Vector3 screenPoint = camera.WorldToScreenPoint(transform.position);
 		Rect guiRect;
 		foreach(GUIInfo elem in guiInfos) {
 			newStyle.fontSize = elem.fontSize;

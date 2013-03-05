@@ -13,9 +13,8 @@ public class CameraFollow : MonoBehaviour {
 	Vector3 myPosition;
 	
 	void Start() {
-		myRoom = transform.parent.GetComponent<Room>();
-		ilo = myRoom.getIloInstance();
-		controller = ilo.GetComponent<IloController>();		
+		ilo = LevelManager.instance.getIlo();
+		controller = ilo.GetComponent<IloController>();	
 		OnEnable();
 	}
 	
