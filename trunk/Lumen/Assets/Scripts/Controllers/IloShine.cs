@@ -4,23 +4,23 @@ using System.Collections;
 public class IloShine : MonoBehaviour {
 	
 	public int maxShine;
-	public float maxIntensity;
+	public float maxRange;
 	int shine;
 	
 	Room myRoom;
-	float intensityStep;
+	float rangeStep;
 	
 	Light iloLight;
 	
 	void Awake() {
 		iloLight = gameObject.GetComponentInChildren<Light>();
-		intensityStep = 1/8f;
+		rangeStep = 1/16f;
 	}
 	
 	// Use this for initialization
 	void OnEnable () {
 		shine = maxShine;
-		iloLight.range = maxIntensity;
+		iloLight.range = maxRange;
 		StartCoroutine("FadeDark");
 		StartCoroutine("LoseShine");
 	}
@@ -38,8 +38,8 @@ public class IloShine : MonoBehaviour {
 	
 	IEnumerator FadeDark() {
 		while(iloLight.range > 0) {
-			iloLight.range -= intensityStep*maxIntensity/maxShine;
-			yield return new WaitForSeconds(intensityStep);
+			iloLight.range -= rangeStep*maxRange/maxShine;
+			yield return new WaitForSeconds(rangeStep);
 		}
 		iloLight.range = 0;
 		StopCoroutine("FadeDark");
@@ -60,12 +60,12 @@ public class IloShine : MonoBehaviour {
 	Vector3 shineZoneCenter;
 	float maxDistanceToCenter;
 	int startShine;
-	float startIntensity;
+	float startRange;
 	
 	public void StartFadeLight(Vector3 lightPoint) {
 		CancelInvoke();
 		StartCoroutine("fadeUpShine");
-		StartCoroutine("fadeUpIntensity");
+		StartCoroutine("fadeUpRange");
 	}
 	
 	
@@ -78,19 +78,19 @@ public class IloShine : MonoBehaviour {
 		
 	}
 	
-	IEnumerator fadeUpIntensity() {
-		while(iloLight.range < maxIntensity) {
-        	yield return new WaitForSeconds(0.01f/(maxIntensity/maxShine));
+	IEnumerator fadeUpRange() {
+		while(iloLight.range < maxRange) {
+        	yield return new WaitForSeconds(0.01f/(maxRange/maxShine));
 			iloLight.range += 0.1f;
 		}
-		iloLight.range = maxIntensity;
+		iloLight.range = maxRange;
 	}
 	
 	public void EndFadeLight() {
 		StopCoroutine("fadeUpShine");
-		StopCoroutine("fadeUpIntensity");
+		StopCoroutine("fadeUpRange");
 		InvokeRepeating("LoseShine",1,1);
-		InvokeRepeating("FadeDark",1,intensityStep);
+		InvokeRepeating("FadeDark",1,rangeStep);
 	}
 	#endregion
 	
