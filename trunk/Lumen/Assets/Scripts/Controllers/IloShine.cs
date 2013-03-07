@@ -20,7 +20,7 @@ public class IloShine : MonoBehaviour {
 	// Use this for initialization
 	void OnEnable () {
 		shine = maxShine;
-		iloLight.intensity = maxIntensity;
+		iloLight.range = maxIntensity;
 		StartCoroutine("FadeDark");
 		StartCoroutine("LoseShine");
 	}
@@ -37,11 +37,11 @@ public class IloShine : MonoBehaviour {
 	#region lose shine
 	
 	IEnumerator FadeDark() {
-		while(iloLight.intensity > 0) {
-			iloLight.intensity -= intensityStep*maxIntensity/maxShine;
+		while(iloLight.range > 0) {
+			iloLight.range -= intensityStep*maxIntensity/maxShine;
 			yield return new WaitForSeconds(intensityStep);
 		}
-		iloLight.intensity = 0;
+		iloLight.range = 0;
 		StopCoroutine("FadeDark");
 	}
 	
@@ -79,11 +79,11 @@ public class IloShine : MonoBehaviour {
 	}
 	
 	IEnumerator fadeUpIntensity() {
-		while(iloLight.intensity < maxIntensity) {
+		while(iloLight.range < maxIntensity) {
         	yield return new WaitForSeconds(0.01f/(maxIntensity/maxShine));
-			iloLight.intensity += 0.1f;
+			iloLight.range += 0.1f;
 		}
-		iloLight.intensity = maxIntensity;
+		iloLight.range = maxIntensity;
 	}
 	
 	public void EndFadeLight() {
