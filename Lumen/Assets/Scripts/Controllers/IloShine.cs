@@ -57,13 +57,10 @@ public class IloShine : MonoBehaviour {
 	#endregion
 	
 	#region gain shine
-	Vector3 shineZoneCenter;
-	float maxDistanceToCenter;
-	int startShine;
-	float startRange;
 	
-	public void StartFadeLight(Vector3 lightPoint) {
-		CancelInvoke();
+	public void StartFadeLight() {
+		StopCoroutine("FadeDark");
+		StopCoroutine("LoseShine");
 		StartCoroutine("fadeUpShine");
 		StartCoroutine("fadeUpRange");
 	}
@@ -71,7 +68,7 @@ public class IloShine : MonoBehaviour {
 	
 	IEnumerator fadeUpShine() {
 		while(shine < maxShine) {
-        	yield return new WaitForSeconds(0.01f);
+        	yield return new WaitForSeconds(0.005f);
 			shine += 1;
 		}
 		shine = maxShine;
@@ -80,8 +77,8 @@ public class IloShine : MonoBehaviour {
 	
 	IEnumerator fadeUpRange() {
 		while(iloLight.range < maxRange) {
-        	yield return new WaitForSeconds(0.01f/(maxRange/maxShine));
-			iloLight.range += 0.1f;
+        	yield return new WaitForSeconds(0.005f/(maxRange/maxShine));
+			iloLight.range += 0.3f;
 		}
 		iloLight.range = maxRange;
 	}
@@ -89,8 +86,8 @@ public class IloShine : MonoBehaviour {
 	public void EndFadeLight() {
 		StopCoroutine("fadeUpShine");
 		StopCoroutine("fadeUpRange");
-		InvokeRepeating("LoseShine",1,1);
-		InvokeRepeating("FadeDark",1,rangeStep);
+		StartCoroutine("FadeDark");
+		StartCoroutine("LoseShine");
 	}
 	#endregion
 	

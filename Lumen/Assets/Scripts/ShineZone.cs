@@ -6,7 +6,7 @@ public class ShineZone : MonoBehaviour {
 	void OnTriggerEnter(Collider collider) {
 		if(collider.tag == "Player") 
 		{
-			collider.GetComponent<IloShine>().StartFadeLight(transform.position);
+			collider.GetComponent<IloShine>().StartFadeLight();
 		}
 	}
 	
