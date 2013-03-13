@@ -15,15 +15,15 @@ public class LevelHub : Level {
 			}
 		}
 
-		levelManager = LevelManager.instance;
+		levelManager = Game.instance.levelManager;
 		lastLevelEntered = 0;
 		setCurrentRoom(0, 0);
 	}
 	
 	//Not called on startup, but every time after
 	protected override void OnEnable() {
-		/* assumes keyhole 0 is from level hub
-		 * and keyholes 1-n are to levels
+		/* assumes spawn point 0 is from level hub
+		 * and spawn points 1-n are to levels
 		 * */
 		setCurrentRoom(hubRoomNum, lastLevelEntered);
 	}
