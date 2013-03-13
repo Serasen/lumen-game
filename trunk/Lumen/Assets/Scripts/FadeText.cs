@@ -3,7 +3,7 @@ using System.Collections;
 
 public class FadeText : MonoBehaviour {
 	
-	Camera camera;
+	Camera mainCamera;
 	
 	float alphaValue;
 	
@@ -18,7 +18,7 @@ public class FadeText : MonoBehaviour {
 	}
 	
 	void Start() {
-		camera = LevelManager.instance.getCamera();
+		mainCamera = Game.instance.levelManager.getCamera();
 		alphaValue = 0f;	
 	}
 	
@@ -40,7 +40,7 @@ public class FadeText : MonoBehaviour {
 		GUIStyle newStyle = new GUIStyle();
 		newStyle.alignment = TextAnchor.UpperCenter;
 		newStyle.normal.textColor = new Color(1,1,1,alphaValue);
-		Vector3 screenPoint = camera.WorldToScreenPoint(transform.position);
+		Vector3 screenPoint = mainCamera.WorldToScreenPoint(transform.position);
 		Rect guiRect;
 		foreach(GUIInfo elem in guiInfos) {
 			newStyle.fontSize = elem.fontSize;

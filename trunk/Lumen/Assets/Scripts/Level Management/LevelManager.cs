@@ -1,9 +1,8 @@
 using UnityEngine;
 using System.Collections;
 
-public class LevelManager : MonoBehaviour {
-	public static LevelManager instance;
-	
+[System.Serializable]
+public class LevelManager {
 	public GameObject[] levels;
 	GameObject[] levelInstances;
 	
@@ -14,15 +13,12 @@ public class LevelManager : MonoBehaviour {
 	
 	GameObject iloInstance;
 	
-	void Awake () {
-		iloInstance = (GameObject) Instantiate(iloPrefab);
-		instance = this;
-	}
-	
-	void Start () {
+	public void initialize() {
+		iloInstance = (GameObject) GameObject.Instantiate(iloPrefab);
+
 		levelInstances = new GameObject[levels.Length];
 		levelNumber = 0;
-		changeLevel(0);
+		changeLevel(0);		
 	}
 	
 	public void changeLevel(int level) {
@@ -39,11 +35,16 @@ public class LevelManager : MonoBehaviour {
 		if(levelInstances[levelNumber] == null) {
 			currentLevel = (GameObject) GameObject.Instantiate(levels[levelNumber]); 
 			levelInstances[levelNumber] = currentLevel;
-			currentLevel.transform.parent = transform;
+			currentLevel.transform.parent = Game.instance.transform;
 		}
 		else {
 			currentLevel = levelInstances[levelNumber];
 		}
+		/*
+		 *player stats should sync here! 
+		 * 
+		 */
+		
 		currentLevel.SetActive(true);
 	}
 	
@@ -57,7 +58,10 @@ public class LevelManager : MonoBehaviour {
 	
 	Camera currentCamera;
 	public Camera getCamera() {
-		return getCurrentLevel().getCurrentRoom().mainCamera.camera;
+		if(currentCamera == null) {
+			currentCamera = getCurrentLevel().getCurrentRoom().mainCamera.camera;	
+		}
+		return currentCamera;
 	}
 	
 	public GameObject getIlo() {

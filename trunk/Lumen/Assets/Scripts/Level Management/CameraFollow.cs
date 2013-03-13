@@ -13,7 +13,7 @@ public class CameraFollow : MonoBehaviour {
 	Vector3 myPosition;
 	
 	void Start() {
-		ilo = LevelManager.instance.getIlo();
+		ilo = Game.instance.levelManager.getIlo();
 		controller = ilo.GetComponent<IloController>();	
 		OnEnable();
 	}
@@ -48,10 +48,8 @@ public class CameraFollow : MonoBehaviour {
 		myPosition = transform.position;
 		iloPosition = ilo.transform.position;
 		
-		Debug.Log(camera.WorldToViewportPoint(ilo.transform.position));
-		
 		if(!isIloVisible()) {
-			LevelManager.instance.getCurrentLevel().getCurrentRoom().reEnterRoom();
+			Game.instance.levelManager.getCurrentLevel().getCurrentRoom().reEnterRoom();
 		}
 		
 		Vector3 desiredPosition = new Vector3(iloPosition.x,iloPosition.y, myPosition.z);
@@ -66,7 +64,6 @@ public class CameraFollow : MonoBehaviour {
 	}
 	
 	void OnTriggerEnter(Collider collider) {
-		
 		if(Physics.Raycast(transform.position,transform.up, transform.localScale.y/2)) {
 			lockUp = true;
 		}
@@ -79,22 +76,6 @@ public class CameraFollow : MonoBehaviour {
 		if(Physics.Raycast(transform.position,-transform.right, transform.localScale.x/2)) {
 			lockLeft = true;	
 		}
-		/*
-		ContactPoint contact = collision.contacts[0];
-		int x = Mathf.RoundToInt(contact.normal.x);
-		int y = Mathf.RoundToInt(contact.normal.y);
-		if(x != 0) {
-			if(x > 0) lockLeft = true;
-			else lockRight = true;
-		}
-		else {
-			if(y > 0) lockDown = true;
-			else lockUp = true;
-		}
-		*/
-		/*foreach(ContactPoint cp in collision.contacts) {
-			Debug.DrawRay(cp.point, cp.normal*10,Color.green, 1);
-		}*/
 	}
 	
 	void OnCollisionExit(Collision collision) {
@@ -110,10 +91,6 @@ public class CameraFollow : MonoBehaviour {
 			if(y > 0) lockDown = false;
 			else lockUp = false;
 		}
-
-		/*foreach(ContactPoint cp in collision.contacts) {
-			Debug.DrawRay(cp.point, cp.normal*10,Color.green, 1);
-		}*/
 	}
 	
 	void OnTriggerExit(Collider collider) {

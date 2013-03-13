@@ -92,6 +92,7 @@ public class IloController : MonoBehaviour {
 			}
 			
 			transform.eulerAngles = new Vector3(0,0,transform.eulerAngles.z);
+			
 			transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
 			
 			rigidbody.velocity = input*runSpeed*transform.right.normalized;
@@ -181,6 +182,8 @@ public class IloController : MonoBehaviour {
 		jumpVector = Vector3.Reflect(-jumpVector, transform.right).normalized*jumpSpeed;
 						
 		rigidbody.velocity = jumpVector;
+		
+		transform.eulerAngles = new Vector3(0,0,transform.eulerAngles.z);
 	}
 	
 	public bool isJumping() {

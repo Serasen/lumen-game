@@ -6,7 +6,7 @@ public class EnterLevelKeyhole : Keyhole {
 	
 	protected override void OnTriggerEnter(Collider collider) {
 		if(collider.tag == "Player") {
-			myRoom.reachedLevelKeyhole(levelToEnter);
+			myRoom.levelKeyholeReached(keyholeNum, levelToEnter);
 		}
 	}
 	

@@ -15,7 +15,7 @@ public class Keyhole : MonoBehaviour {
 	
 	protected virtual void OnTriggerEnter(Collider collider) {
 		if(collider.tag == "Player") {
-			myRoom.reachedKeyhole(keyholeNum);
+			myRoom.keyholeReached(keyholeNum);
 		}
 	}
 	

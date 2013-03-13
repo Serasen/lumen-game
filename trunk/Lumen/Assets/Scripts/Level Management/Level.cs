@@ -28,8 +28,7 @@ public class Level : MonoBehaviour {
 	}
 	
 	protected virtual void Start() {
-		levelManager = LevelManager.instance;
-		//OnEnable();
+		levelManager = Game.instance.levelManager;
 	}
 	
 	protected virtual void OnEnable() {
@@ -37,7 +36,6 @@ public class Level : MonoBehaviour {
 	}
 	
 	public void changeRoom(int keyhole) {
-		//Debug.Log("startRoom: " + roomNumber + " length: " + rooms[roomNumber].mappings.Length + " keyhole: " + keyhole);
 		RoomMapping mapping = rooms[roomNumber].mappings[keyhole];
 		for(int i = 0; i < rooms.Length; i++) {
 			if(rooms[i].room == mapping.destRoom) {
