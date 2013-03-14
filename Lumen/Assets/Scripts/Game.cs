@@ -10,6 +10,7 @@ public class Game : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		instance = this;
+		dataManager = new DataManager();
 		levelManager.initialize();
 	}
 }

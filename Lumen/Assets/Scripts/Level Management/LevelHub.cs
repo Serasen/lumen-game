@@ -6,7 +6,7 @@ public class LevelHub : Level {
 	int hubRoomNum;
 	int lastLevelEntered;
 	
-	protected override void Start() {
+	void Start() {
 		
 		for(int i = 0; i < rooms.Length; i++) {
 			if(rooms[i].room == hubRoom) {
@@ -14,14 +14,13 @@ public class LevelHub : Level {
 				break;
 			}
 		}
-
-		levelManager = Game.instance.levelManager;
 		lastLevelEntered = 0;
 		setCurrentRoom(0, 0);
 	}
 	
 	//Not called on startup, but every time after
 	protected override void OnEnable() {
+		initializeLevelData();
 		/* assumes spawn point 0 is from level hub
 		 * and spawn points 1-n are to levels
 		 * */
