@@ -44,7 +44,6 @@ public class DataManager {
 		currentLevelData.deaths += currentRoomData.deaths;
 		gameData.deaths += currentRoomData.deaths;
 		Game.instance.dataManager.Save();
-//		Debug.Log(gameData.deaths);
 	}
 	#endregion
 	
@@ -66,11 +65,10 @@ public class DataManager {
 	public void Save () {Save (currentFilePath);}
 	public void Save (string filePath)
 	{
-		GameData data = new GameData ();
 		Stream stream = File.Open(filePath, FileMode.Create);
 		BinaryFormatter bformatter = new BinaryFormatter();
 		bformatter.Binder = new VersionDeserializationBinder(); 
-		bformatter.Serialize(stream, data);
+		bformatter.Serialize(stream, gameData);
 		stream.Close();
 	}
  
