@@ -4,9 +4,7 @@ using System.Collections;
 public class Room : MonoBehaviour {
 	
 	public SpawnPoint[] spawnPoints;
-	
 	public GameObject[] keyholes;
-	bool[] reachedKeyholes; //for serialization
 	
 	[System.Serializable]
 	public class SpawnPoint {
@@ -15,25 +13,37 @@ public class Room : MonoBehaviour {
 	}
 	
 	public GameObject mainCamera;
-	
+
 	GameObject iloInstance;
 	int latestSpawnPoint;
-	
+	RoomData roomData;
 	
 	void Start() {
 		int i = 0;
-		reachedKeyholes = new bool[keyholes.Length];
-		
 		foreach(GameObject g in keyholes) {
 			g.GetComponent<Keyhole>().setKeyholeNum(i++);	
 		}
 	}
 	
 	void OnEnable() {
+		//initialize room data
+		RoomData tempData = Game.instance.dataManager.GetRoomData();
+		if(tempData == null) {
+			roomData = new RoomData(keyholes.Length);
+			Game.instance.dataManager.SetRoomData(roomData);
+		}
+		else {
+			roomData = new RoomData(tempData);	
+		}
+		
 		iloInstance = Game.instance.levelManager.getIlo();
 	}
 	
 	public void reEnterRoom() {
+		
+		roomData.deaths++;
+		Game.instance.dataManager.SetRoomData(roomData);
+		
 		gameObject.SetActive(false);
 		enterRoom(latestSpawnPoint);
 	}
@@ -51,20 +61,20 @@ public class Room : MonoBehaviour {
 	}
 	
 	public void keyholeReached(int keyhole) {
-		updateReachedKeyhole(keyhole);
+		roomData.keyholes[keyhole] = true;
+		Game.instance.dataManager.SetRoomData(roomData);
+
 		gameObject.SetActive(false);
 		Game.instance.levelManager.getCurrentLevel().changeRoom(keyhole);
 		
 	}
 	
 	public void levelKeyholeReached(int keyhole, int levelToEnter) {
-		updateReachedKeyhole(keyhole);
+		roomData.keyholes[keyhole] = true;
+		Game.instance.dataManager.SetRoomData(roomData);
+		
 		latestSpawnPoint = 0;
 		gameObject.SetActive(false);
 		Game.instance.levelManager.changeLevel(levelToEnter);
-	}
-	
-	public void updateReachedKeyhole(int keyhole) {
-		reachedKeyholes[keyhole] = true;
 	}
 }
