@@ -3,19 +3,25 @@ using System.Collections;
 
 public class IloController : MonoBehaviour {
 	
-	bool onSurface;
-	bool midJump;
-	bool jumpFromWall;
-	
 	Vector3 surfaceNormal; //normal of surface currently occupied
 	Vector3 jumpVector;
 	
-	float input;
+	//float input;
 	bool reverseHorizontalInput;
 	bool reverseVerticalInput;
 	
 	public float runSpeed;
 	public float jumpSpeed;
+	
+	enum STATE {
+		WALKING,
+		JUMPING,
+		JUMPING_FROM_WALL,
+		FALLING,
+		REFLECTING
+	}
+	
+	int state;
 	
 	//If angle of surface to descend is greater than this, slide off
 	const float maxDescentAngle = 60f;
@@ -24,9 +30,7 @@ public class IloController : MonoBehaviour {
 
 	// Use this for initialization
 	void OnEnable () {
-		onSurface = true;
-		midJump = false;
-		jumpFromWall = false;
+		state = (int)STATE.WALKING;
 		reverseHorizontalInput = false;
 		reverseVerticalInput = false;
 		
@@ -34,26 +38,6 @@ public class IloController : MonoBehaviour {
 		jumpVector = -transform.up;
 		
 	}
-	
-/*	float GetInput() {
-		float input;
-		float horizontalInput = Input.GetAxis("Horizontal");
-		float verticalInput = Input.GetAxis("Vertical");
-		if(horizontalInput == 0) {
-			reverseHorizontalInput = Vector3.Angle(transform.up, Vector3.up) > 95f;
-			if(verticalInput == 0) {
-				reverseVerticalInput = transform.right.y < 0;
-				input = 0;
-			}
-			else {
-				input = verticalInput * (reverseVerticalInput ? -1 : 1);
-			}
-		}
-		else {
-			input = horizontalInput * (reverseHorizontalInput ? -1 : 1);
-		}
-		return input;
-	} */
 	
 	float GetInput() {
 		float input;
@@ -71,87 +55,63 @@ public class IloController : MonoBehaviour {
 		}
 		return input;
 	}
-
 	
-	// Update is called once per frame
-	void Update () {
-		RaycastHit hit;
-		input = GetInput();
-		
-		if(onSurface) {
-			
-			if(Physics.Raycast(transform.position, -surfaceNormal, out hit, transform.localScale.y*2) &&
-				Vector3.Angle(surfaceNormal, hit.normal) < maxDescentAngle) 
-			{
-				surfaceNormal = hit.normal;
-				transform.up = Vector3.Lerp(transform.up, surfaceNormal, 10*Time.deltaTime);	
-				transform.position = hit.point + surfaceNormal*transform.localScale.y*0.5f;
-			}
-			else {
-				onSurface = false;
-			}
-			
-			transform.eulerAngles = new Vector3(0,0,transform.eulerAngles.z);
-			
-			transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
-			
-			rigidbody.velocity = input*runSpeed*transform.right.normalized;
-			//on-surface movement
-					
-			if(Input.GetButtonDown("Jump"))
-			{
-				initiateJump();
-			}
+	void Update() {
+		switch(state) {
+			case (int)STATE.WALKING: Walk_Update(); break;
+			case (int)STATE.JUMPING: Jump_Update(); break;
+			case (int)STATE.JUMPING_FROM_WALL: break;
+			case (int)STATE.FALLING: Fall_Update(); break;
+			case (int)STATE.REFLECTING: Reflect_Update(); break;
 		}
-		else {
-			Vector3 inputDirection = input*transform.right.normalized;
-			if(!jumpFromWall) rigidbody.velocity += inputDirection;
-			
-			if(!midJump && rigidbody.velocity.magnitude < jumpSpeed) {
-				rigidbody.AddForce(-surfaceNormal.normalized*jumpSpeed, ForceMode.Acceleration);
-			}
-			jumpVector = rigidbody.velocity;
-		}	
 	}
 	
 	void OnCollisionEnter(Collision collision) {
-		RaycastHit hit;
-		if(!onSurface ) {
-			ContactPoint contact = collision.contacts[0];
-			
-			if(!(midJump && Vector3.Angle(contact.normal, transform.up) < minTransferAngle)) 
-			{
-				if(Physics.Raycast(transform.position, (contact.point - transform.position), out hit)) {
-					if(collision.gameObject.tag != "Mirror") {
-						Vector3 contactNormal = hit.normal;
-						if(Vector3.Angle(surfaceNormal, contactNormal) > 150f) {
-							reverseHorizontalInput = !reverseHorizontalInput;
-							reverseVerticalInput = !reverseVerticalInput;
-						}
-				
-						surfaceNormal = contactNormal;
-				
-						transform.rotation = Quaternion.FromToRotation(Vector3.up, surfaceNormal);
-				
-						if(!midJump) {
-							reverseHorizontalInput = Vector3.Angle(transform.up, Vector3.up) > 95f;
-							reverseVerticalInput = transform.right.y < 0;
-						}
-				
-						onSurface = true;
-						midJump = false;
-						jumpFromWall = false;
-					}
-					else {	
-						//momentarily on surface, for camera
-						surfaceNormal = hit.normal;
-						initiateReflect();
-					}
-				}
-				
-			}
+		switch(state) {
+			case (int)STATE.WALKING: Walk_OnCollisionEnter(collision); break;
+			case (int)STATE.JUMPING_FROM_WALL:
+			case (int)STATE.JUMPING: Jump_OnCollisionEnter(collision); break;
+			case (int)STATE.FALLING: Fall_OnCollisionEnter(collision); break;
+			case (int)STATE.REFLECTING: Jump_OnCollisionEnter(collision); break;
 		}
-		else if(Physics.Raycast(transform.position, -transform.right, out hit, transform.localScale.y) ||
+	}
+	
+	public bool isJumping() {
+		return (state == (int)STATE.JUMPING);
+	}
+	
+	public bool isMoving() {
+		return (rigidbody.velocity != Vector3.zero);
+	}
+	
+	#region walking
+	void Walk_Update() {
+		float input = GetInput();
+		
+		RaycastHit hit;
+		if(Physics.Raycast(transform.position, -surfaceNormal, out hit, transform.localScale.y*2) &&
+			Vector3.Angle(surfaceNormal, hit.normal) < maxDescentAngle) 
+		{
+			surfaceNormal = hit.normal;
+			transform.up = Vector3.Lerp(transform.up, surfaceNormal, 10*Time.deltaTime);	
+			transform.position = hit.point + surfaceNormal*transform.localScale.y*0.5f;
+		}
+		else {
+			state = (int)STATE.FALLING;
+		}
+			
+		transform.eulerAngles = new Vector3(0,0,transform.eulerAngles.z);
+		transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
+		rigidbody.velocity = input*runSpeed*transform.right.normalized;			
+		if(Input.GetButtonDown("Jump"))
+		{
+			initiateJump();
+		}		
+	}
+	
+	void Walk_OnCollisionEnter(Collision collision) {
+		RaycastHit hit;
+		if(Physics.Raycast(transform.position, -transform.right, out hit, transform.localScale.y) ||
 			Physics.Raycast(transform.position, transform.right, out hit, transform.localScale.y)) {
 			if(Vector3.Angle(hit.normal, surfaceNormal) < 60f) {
 				surfaceNormal = collision.contacts[0].normal;
@@ -159,38 +119,106 @@ public class IloController : MonoBehaviour {
 			}
 		}
 	}
+	#endregion
 	
+	#region jumping
+	
+		
 	public void initiateJump() {
-		onSurface = false;
-		midJump = true;
 		Vector3 leanDirection = GetInput() * transform.right;
 		if(Physics.Raycast(transform.position, leanDirection, transform.localScale.y*0.5f)) {
-			jumpFromWall = true;
+			jumpVector = surfaceNormal;
+			state = (int)STATE.JUMPING_FROM_WALL;
 		}
-		jumpVector = (surfaceNormal + (jumpFromWall ? Vector3.zero : leanDirection)).normalized*jumpSpeed;
+		else {
+			jumpVector = surfaceNormal + leanDirection;
+			state = (int)STATE.JUMPING;
+		}
+		jumpVector = jumpVector.normalized*jumpSpeed;
 		rigidbody.velocity = jumpVector;
 	}
 	
-	public void initiateReflect() {
-		reverseHorizontalInput = false;
-		reverseVerticalInput = false;
-		
-						
-		onSurface = false;
-		midJump = true;
+	void Jump_Update() {
+		float input = GetInput();
+		rigidbody.velocity += input*transform.right.normalized;
+		jumpVector = rigidbody.velocity;		
+	}
+	
+	void Jump_OnCollisionEnter(Collision collision) {
+		RaycastHit hit;
+		ContactPoint contact = collision.contacts[0];
+		if(Vector3.Angle(contact.normal, transform.up) >= minTransferAngle &&
+			Physics.Raycast(transform.position, (contact.point - transform.position), out hit)) 
+		{
+			Vector3 contactNormal = hit.normal;
+			if(Vector3.Angle(surfaceNormal, contactNormal) > 150f) {
+				reverseHorizontalInput = !reverseHorizontalInput;
+				reverseVerticalInput = !reverseVerticalInput;
+			}
+			if(collision.gameObject.tag != "Mirror") {
+				surfaceNormal = contactNormal;
+				transform.rotation = Quaternion.FromToRotation(Vector3.up, surfaceNormal);
+				state = (int)STATE.WALKING;
+			}
+			else {	
+				initiateReflect(hit.normal);
+			}			
+		}	
+	}
+	#endregion
+	
+	#region falling
+	void Fall_Update() {
+		float input = GetInput();
+		Vector3 inputDirection = input*transform.right.normalized;
+		rigidbody.velocity += inputDirection;
+			
+		if(rigidbody.velocity.magnitude < jumpSpeed) {
+			rigidbody.AddForce(-surfaceNormal.normalized*jumpSpeed, ForceMode.Acceleration);
+		}
+		jumpVector = rigidbody.velocity;		
+	}
+	
+	void Fall_OnCollisionEnter(Collision collision) {
+		RaycastHit hit;
+		ContactPoint contact = collision.contacts[0];
+		if(Physics.Raycast(transform.position, (contact.point - transform.position), out hit)) {
+			Vector3 contactNormal = hit.normal;
+			if(Vector3.Angle(surfaceNormal, contactNormal) > 150f) {
+				reverseHorizontalInput = !reverseHorizontalInput;
+				reverseVerticalInput = !reverseVerticalInput;
+			}
+			if(collision.gameObject.tag != "Mirror") {
+				surfaceNormal = contactNormal;
+				transform.rotation = Quaternion.FromToRotation(Vector3.up, surfaceNormal);
+				reverseHorizontalInput = Vector3.Angle(transform.up, Vector3.up) > 95f;
+				reverseVerticalInput = transform.right.y < 0;
+				state = (int)STATE.WALKING;
+			}
+			else {	
+				initiateReflect(hit.normal);
+			}
+		}		
+	}
+	#endregion
+	
+	#region reflecting
+	
+	public void initiateReflect(Vector3 hitNormal) {
+		surfaceNormal = hitNormal;
 		transform.up = surfaceNormal;
 		jumpVector = Vector3.Reflect(-jumpVector, transform.right).normalized*jumpSpeed;
-						
 		rigidbody.velocity = jumpVector;
-		
 		transform.eulerAngles = new Vector3(0,0,transform.eulerAngles.z);
+		state = (int)STATE.REFLECTING;
 	}
 	
-	public bool isJumping() {
-		return midJump;
-	}
+	void Reflect_Update() {
+		float input = GetInput();
+		Vector3 inputDirection = input*transform.right.normalized;
+		rigidbody.velocity += inputDirection;
+		jumpVector = rigidbody.velocity;		
+	}	
 	
-	public bool isMoving() {
-		return (input != 0);
-	}
+	#endregion
 }
