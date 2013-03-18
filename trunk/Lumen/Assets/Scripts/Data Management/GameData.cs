@@ -38,8 +38,10 @@ public class GameData : ISerializable {
 [Serializable ()]
 public class LevelData : ISerializable {
 	public RoomData[] rooms;
+	public bool unlocked;
 	public int deaths;
 	
+	//Call default constructor to indicate unlocked status
 	public LevelData () {
 		deaths = 0;
 	}
@@ -50,6 +52,35 @@ public class LevelData : ISerializable {
 	{
 		rooms = (RoomData[])info.GetValue("rooms", typeof(RoomData[]));
 		deaths = (int)info.GetValue("deaths", typeof(int));
+	}
+	
+	public int GetNumReachedRooms() {
+		int reachedRooms = 0;
+		foreach(RoomData room in rooms) {
+			if(room != null) reachedRooms++;
+		}
+		return reachedRooms;
+	}
+	
+	public int getNumReachedKeyholes() {
+		int reachedKeyholes = 0;
+		foreach(RoomData room in rooms) {
+			if(room != null) {
+				reachedKeyholes += room.GetNumReachedKeyholes();
+			}
+		}
+		return reachedKeyholes;
+	}
+	
+	public int getNumKeyholes() {
+		int keyholes = 0;
+		foreach(RoomData room in rooms) {
+			if(room != null) {
+				keyholes += room.keyholes.Length;
+			}
+		}
+		return keyholes;
+		
 	}
  
 	public void GetObjectData (SerializationInfo info, StreamingContext ctxt)
@@ -81,6 +112,14 @@ public class RoomData : ISerializable {
 	{
 		keyholes = (bool[])info.GetValue("keyholes", typeof(bool[]));
 		deaths = (int)info.GetValue("deaths", typeof(int));
+	}
+	
+	public int GetNumReachedKeyholes() {
+		int reached = 0;
+		foreach(bool keyholeReached in keyholes) {
+			if(keyholeReached)	reached++;
+		}
+		return reached;
 	}
  
 	public void GetObjectData (SerializationInfo info, StreamingContext ctxt)

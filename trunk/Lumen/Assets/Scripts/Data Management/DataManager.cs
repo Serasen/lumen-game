@@ -16,7 +16,27 @@ public class DataManager {
 		gameData = Load();
 	}
 	
-	#region getters and setters 
+	#region random access getters and setters
+	
+	public LevelData GetLevelData(int level) {
+		return gameData.levels[level];
+	}
+	
+	public bool isLevelUnlocked(int level) {
+		bool isUnlocked = true;
+		/*
+		 * level 0 = hub
+		 * level 1 is automatically unlocked
+		 */
+		if(level >= gameData.levels.Length || 
+			(level > 1 && GetLevelData(level) == null))
+			isUnlocked = false;
+		return isUnlocked;
+	}
+	
+	#endregion
+	
+	#region pointer getters and setters 
 	
 	public GameData GetGameData() {return gameData;}	
 	public void SetGameData(GameData newData) {
@@ -43,12 +63,18 @@ public class DataManager {
 		//update death count
 		currentLevelData.deaths += currentRoomData.deaths;
 		gameData.deaths += currentRoomData.deaths;
-		Game.instance.dataManager.Save();
 	}
+	
 	#endregion
 	
 	#region change pointers
 	public void ChangeLevel(int newLevel) {
+		if(newLevel == 0 && !isLevelUnlocked(levelNum + 1) && 
+			levelNum + 1 < gameData.levels.Length) {
+			
+			gameData.levels[levelNum + 1] = new LevelData();	
+		}
+		
 		levelNum = newLevel;
 		currentLevelData = gameData.levels[levelNum];
 	}
@@ -56,6 +82,7 @@ public class DataManager {
 	public void ChangeRoom(int newRoom) {
 		roomNum = newRoom;
 		currentRoomData = currentLevelData.rooms[roomNum];
+		Game.instance.dataManager.Save();
 	}
 	#endregion
 	

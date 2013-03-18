@@ -37,7 +37,7 @@ public class Level : MonoBehaviour {
 	
 	protected void initializeLevelData() {
 		levelData = Game.instance.dataManager.GetLevelData();
-		if(levelData == null) {
+		if(levelData == null || levelData.rooms == null) {
 			levelData = new LevelData(rooms.Length);
 			Game.instance.dataManager.SetLevelData(levelData);
 		}		
