@@ -25,6 +25,9 @@ public class CameraFollow : MonoBehaviour {
 	
 	void OnEnable() {
 		
+		isWaitingToExpand = false;
+		isReturning = false;
+		
 		lockUp = false;
 		lockDown = false;
 		lockLeft = false;
@@ -64,16 +67,19 @@ public class CameraFollow : MonoBehaviour {
 	}
 	
 	void OnTriggerEnter(Collider collider) {
-		if(Physics.Raycast(transform.position,transform.up, transform.localScale.y/2)) {
+		Vector3 pos = transform.position;
+		float scaleX = transform.localScale.x/2;
+		float scaleY = transform.localScale.y/2;
+		if(Physics.Raycast(pos,transform.up, scaleY)) {
 			lockUp = true;
 		}
-		if(Physics.Raycast(transform.position,-transform.up, transform.localScale.y/2)) {
+		if(Physics.Raycast(pos,-transform.up, scaleY)) {
 			lockDown = true;	
 		}
-		if(Physics.Raycast(transform.position,transform.right, transform.localScale.x/2)) {
+		if(Physics.Raycast(pos,transform.right, scaleX)) {
 			lockRight = true;	
 		}
-		if(Physics.Raycast(transform.position,-transform.right, transform.localScale.x/2)) {
+		if(Physics.Raycast(pos,-transform.right, scaleX)) {
 			lockLeft = true;	
 		}
 	}
@@ -94,52 +100,59 @@ public class CameraFollow : MonoBehaviour {
 	}
 	
 	void OnTriggerExit(Collider collider) {
-		if(!Physics.Raycast(transform.position,transform.up, transform.localScale.y/2)) {
+		Vector3 pos = transform.position;
+		float scaleX = transform.localScale.x/2;
+		float scaleY = transform.localScale.y/2;
+		if(!Physics.Raycast(pos,transform.up, scaleY)) {
 			lockUp = false;
 		}
-		if(!Physics.Raycast(transform.position,-transform.up, transform.localScale.y/2)) {
+		if(!Physics.Raycast(pos,-transform.up, scaleY)) {
 			lockDown = false;	
 		}
-		if(!Physics.Raycast(transform.position,transform.right, transform.localScale.x/2)) {
+		if(!Physics.Raycast(pos,transform.right, scaleX)) {
 			lockRight = false;	
 		}
-		if(!Physics.Raycast(transform.position,-transform.right, transform.localScale.x/2)) {
+		if(!Physics.Raycast(pos,-transform.right, scaleX)) {
 			lockLeft = false;	
 		}
 	}
 	
 	#region adjust camera size
 	
+	bool isWaitingToExpand;
+	bool isReturning;
+	
 	void AdjustCameraSize() {
 		
 		if(controller.isJumping() && camera.orthographicSize < initialSize*2) {
-			CancelInvoke();
-			InvokeRepeating("IncreaseCameraSize", 1f, 1/60f);
+			if(!isWaitingToExpand) {
+				StartCoroutine("IncreaseCameraSize");
+			}
 		}
-		else  {
-			Invoke("ResetCameraSize", 0);
+		else if(!isReturning){
+			StopCoroutine("IncreaseCameraSize");
+			isWaitingToExpand = false;
+			StartCoroutine("ResetCameraSize");
 		}
 	}
-	
-	void IncreaseCameraSize() {
-		if(controller.isJumping() && camera.orthographicSize < initialSize*2) {
+
+	IEnumerator IncreaseCameraSize() {
+		isWaitingToExpand = true;
+		yield return new WaitForSeconds(1);
+		isReturning = false;
+		StopCoroutine("ResetCameraSize");
+		while(controller.isJumping() && camera.orthographicSize < initialSize*2) {
+			yield return new WaitForSeconds(1/60f);
 			camera.orthographicSize += 0.1f;
-			AdjustCameraBounds();
-		}
-		else {
-			CancelInvoke();
-			InvokeRepeating("AdjustCameraSize", 0, 1/60f);
 		}
 	}
 	
-	void ResetCameraSize() {
-		if(camera.orthographicSize > initialSize) {
-			camera.orthographicSize -= 0.1f;
-			AdjustCameraBounds();
-		}
-		else {
-			CancelInvoke("ResetCameraSize");	
-		}
+	IEnumerator ResetCameraSize() {
+		isReturning = true;
+		while(camera.orthographicSize > initialSize) {
+			yield return new WaitForSeconds(1/60f);
+			camera.orthographicSize -= 0.2f;
+		}	
 	}
 	
 	#endregion
