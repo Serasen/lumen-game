@@ -5,8 +5,8 @@ public class Keyhole : MonoBehaviour {
 	protected int keyholeNum;
 	protected Room myRoom;
 	
-	void Start() {
-		myRoom = transform.parent.GetComponent<Room>();	
+	protected virtual void Start() {
+		myRoom = Game.instance.levelManager.getCurrentLevel().getCurrentRoom();
 	}
 	
 	public void setKeyholeNum(int num) {

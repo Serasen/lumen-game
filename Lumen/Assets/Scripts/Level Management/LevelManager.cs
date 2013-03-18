@@ -38,7 +38,6 @@ public class LevelManager {
 		}
 		
 		levelBehavior = null;
-		currentCamera = null;
 		
 		levelNumber = level;
 		if(levelInstances[levelNumber] == null) {
@@ -69,9 +68,7 @@ public class LevelManager {
 	
 	Camera currentCamera;
 	public Camera getCamera() {
-		if(currentCamera == null) {
-			currentCamera = getCurrentLevel().getCurrentRoom().mainCamera.camera;	
-		}
+		currentCamera = getCurrentLevel().getCurrentRoom().mainCamera.camera;	
 		return currentCamera;
 	}
 	

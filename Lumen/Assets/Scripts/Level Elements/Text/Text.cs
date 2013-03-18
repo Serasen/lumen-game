@@ -1,11 +1,11 @@
 using UnityEngine;
 using System.Collections;
 
-public class AlwaysVisibleText : MonoBehaviour {
+public class Text : MonoBehaviour {
+		
+	protected Camera mainCamera;
 	
-	Camera mainCamera;
-	
-	float alphaValue;
+	protected float alphaValue;
 	
 	public GUIInfo[] guiInfos;
 	
@@ -17,15 +17,16 @@ public class AlwaysVisibleText : MonoBehaviour {
 		public float posY;
 	}
 	
-	float pixelRatio;
-	
-	void Start() {
-		mainCamera = Game.instance.levelManager.getCamera();
+	protected virtual void OnEnable() {
 		alphaValue = 1f;	
 	}
 	
-	void OnGUI() {
-		pixelRatio = (mainCamera.orthographicSize * 2) / mainCamera.pixelHeight;
+	protected void OnDisable() {
+		alphaValue = 0f;	
+	}
+	
+	protected virtual void OnGUI() {
+		float pixelRatio = (mainCamera.orthographicSize * 2) / mainCamera.pixelHeight;
 		
 		GUIStyle newStyle = new GUIStyle();
 		newStyle.alignment = TextAnchor.UpperCenter;
