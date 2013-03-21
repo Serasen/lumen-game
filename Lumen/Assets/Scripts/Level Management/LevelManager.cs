@@ -16,17 +16,20 @@ public class LevelManager {
 	
 	public void initialize() {
 		iloInstance = (GameObject) GameObject.Instantiate(iloPrefab);
-		
-		//initialize Game Data content
-		gameData = Game.instance.dataManager.GetGameData();
-		if(gameData == null) {
-			gameData = new GameData(levels.Length);
-			Game.instance.dataManager.SetGameData(gameData);
-		}
-		
+		initializeGameData();
 		levelInstances = new GameObject[levels.Length];
 		levelNumber = 0;
 		changeLevel(0);
+	}
+	
+	public void initializeGameData() {
+		//initialize Game Data content
+		gameData = Game.instance.dataManager.GetGameData();
+		if(gameData == null) {		
+			gameData = new GameData(levels.Length);
+			Game.instance.dataManager.SetGameData(gameData);
+		}
+
 	}
 	
 	public void changeLevel(int level) {

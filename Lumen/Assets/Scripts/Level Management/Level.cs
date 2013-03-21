@@ -35,7 +35,7 @@ public class Level : MonoBehaviour {
 		setCurrentRoom(0, 0);
 	}
 	
-	protected void initializeLevelData() {
+	public void initializeLevelData() {
 		levelData = Game.instance.dataManager.GetLevelData();
 		if(levelData == null || levelData.rooms == null) {
 			levelData = new LevelData(rooms.Length);
@@ -57,12 +57,10 @@ public class Level : MonoBehaviour {
 	
 	//Set all state variables and enter room
 	public void setCurrentRoom(int number, int spawnPoint) {
-			
 		//change pointers
 		Game.instance.dataManager.ChangeRoom(number);
 		roomNumber = number;
 		roomBehavior = null;
-		
 		if(roomInstances[roomNumber] == null) {
 			//Instantiate room
 			roomInstances[roomNumber] = (GameObject) GameObject.Instantiate(rooms[roomNumber].room);

@@ -12,10 +12,6 @@ public class DataManager {
 	LevelData currentLevelData;
 	RoomData currentRoomData;
 	
-	public DataManager() {
-		gameData = Load();
-	}
-	
 	#region random access getters and setters
 	
 	public LevelData GetLevelData(int level) {
@@ -31,6 +27,7 @@ public class DataManager {
 		if(level >= gameData.levels.Length || 
 			(level > 1 && GetLevelData(level) == null))
 			isUnlocked = false;
+		else Debug.Log("level " + level + " unlocked!");
 		return isUnlocked;
 	}
 	
@@ -41,6 +38,8 @@ public class DataManager {
 	public GameData GetGameData() {return gameData;}	
 	public void SetGameData(GameData newData) {
 		gameData = newData;
+		currentLevelData = null;
+		currentRoomData = null;
 	}
 	
 	public LevelData GetLevelData() {return currentLevelData;}
@@ -86,25 +85,47 @@ public class DataManager {
 	}
 	#endregion
 	
-	public string currentFilePath = "SaveData.sav";    // Edit this for different save files
- 
-	// Write data
-	public void Save () {Save (currentFilePath);}
-	public void Save (string filePath)
-	{
-		Stream stream = File.Open(filePath, FileMode.Create);
-		BinaryFormatter bformatter = new BinaryFormatter();
-		bformatter.Binder = new VersionDeserializationBinder(); 
-		bformatter.Serialize(stream, gameData);
-		stream.Close();
+	#region file management
+	
+	const string fileDirectory = "SaveData/";
+	const string fileName = "SaveFile";    // Edit this for different save files
+	const string fileTag = ".sav";
+	int currentFileNum = -1;
+	
+	private string getSavePath() {
+		return fileDirectory + fileName + currentFileNum.ToString() + fileTag;
 	}
  
+	public bool DataExists(int saveFile) {
+		bool exists = hasSaved() && 
+			   File.Exists(fileDirectory + fileName + saveFile.ToString() + fileTag);
+		return exists;
+	}
+	
+	// Write data
+	public void Save ()
+	{
+		if(currentFileNum >= 0) {
+			string filePath = getSavePath();
+			if(!hasSaved()) Directory.CreateDirectory(fileDirectory);
+			Stream stream = File.Open(filePath, FileMode.Create);
+			BinaryFormatter bformatter = new BinaryFormatter();
+			bformatter.Binder = new VersionDeserializationBinder(); 
+			bformatter.Serialize(stream, gameData);
+			stream.Close();
+		}
+	}
+ 
+	public void Load(int fileNum) {
+		currentFileNum = fileNum;
+		gameData = Load();
+	}
 	// Load from a file
-	public GameData Load()  { return Load(currentFilePath); }
-	public GameData Load(string filePath) 
+	private GameData Load() 
 	{
 		GameData data = new GameData ();
-		if(File.Exists(filePath)) {
+		string filePath = getSavePath();
+		if(DataExists(currentFileNum)) {
 			Stream stream = File.Open(filePath, FileMode.Open);
 			BinaryFormatter bformatter = new BinaryFormatter();
 			bformatter.Binder = new VersionDeserializationBinder(); 
@@ -114,6 +135,20 @@ public class DataManager {
 		if(data.levels == null) data = null;
 		return data;
 	}
+	
+	public void StartNewGame(int fileNum) {
+		currentFileNum = fileNum;
+		string filePath = getSavePath();
+		if(DataExists(currentFileNum)) File.Delete(filePath);
+		Load(fileNum);
+	}
+	
+	//Returns whether player has save data
+	public bool hasSaved() {
+		return Directory.Exists(fileDirectory);
+	}
+	
+	#endregion
 }
  
 // === This is required to guarantee a fixed serialization assembly name, which Unity likes to randomize on each compile
