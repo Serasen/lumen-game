@@ -11,14 +11,12 @@ public class EnterLevelKeyhole : Keyhole {
 	}
 	
 	void OnEnable() {
+		isUnlocked = Game.instance.dataManager.isLevelUnlocked(levelToEnter);
 		if(!isUnlocked) {
-			isUnlocked = Game.instance.dataManager.isLevelUnlocked(levelToEnter);
-			if(!isUnlocked) {
-				renderer.enabled = false;
-				collider.enabled = false;
-				foreach(Transform child in transform) {
-					child.gameObject.SetActive(false);	
-				}
+			renderer.enabled = false;
+			collider.enabled = false;
+			foreach(Transform child in transform) {
+				child.gameObject.SetActive(false);	
 			}
 		}
 		if(isUnlocked) {
