@@ -1,14 +1,6 @@
 using UnityEngine;
 using System.Collections;
 
-public class Text : MonoBehaviour {
-		
-	protected Camera mainCamera;
-	
-	protected float alphaValue;
-	
-	public GUIInfo[] guiInfos;
-	
 	[System.Serializable]
 	public class GUIInfo {
 		public string text;
@@ -16,6 +8,15 @@ public class Text : MonoBehaviour {
 		public float posX;
 		public float posY;
 	}
+
+public class Text : MonoBehaviour {
+		
+	protected Camera mainCamera;
+	
+	protected float alphaValue;
+	protected float prePauseAlpha;
+	
+	public GUIInfo[] guiInfos;
 	
 	protected virtual void OnEnable() {
 		alphaValue = 1f;	
@@ -26,11 +27,17 @@ public class Text : MonoBehaviour {
 	}
 	
 	protected virtual void OnGUI() {
+		float nowAlpha;
+		if(Game.instance.gameState == (int)GameState.PAUSE) {
+			nowAlpha = 0f;
+		}
+		else nowAlpha = alphaValue;
+		
 		float pixelRatio = (mainCamera.orthographicSize * 2) / mainCamera.pixelHeight;
 		
 		GUIStyle newStyle = new GUIStyle();
 		newStyle.alignment = TextAnchor.UpperCenter;
-		newStyle.normal.textColor = new Color(1,1,1,alphaValue);
+		newStyle.normal.textColor = new Color(1,1,1,nowAlpha);
 		Rect guiRect;
 		
 		foreach(GUIInfo elem in guiInfos) {
