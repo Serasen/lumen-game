@@ -39,6 +39,10 @@ public class IloController : MonoBehaviour {
 		
 	}
 	
+	void OnDisable () {
+		rigidbody.velocity = Vector3.zero;
+	}
+	
 	float GetInput() {
 		float input;
 		float horizontalInput = Input.GetAxis("Horizontal");

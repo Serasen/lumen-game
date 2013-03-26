@@ -29,14 +29,10 @@ public class DarkCrawler : MonoBehaviour {
 
 	}
 	
-	void FixedUpdate() {
-		
-	}
-	
 	void OnCollisionEnter(Collision collision) {
 		if(collision.gameObject.tag.Equals("Player")) {
 			waypoint = -1;
-			Game.instance.levelManager.getCurrentLevel().getCurrentRoom().reEnterRoom();
+			Game.instance.RoomTransition((int)LevelActions.REENTER_ROOM);
 		}
 	}
 	

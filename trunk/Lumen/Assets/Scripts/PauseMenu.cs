@@ -6,8 +6,8 @@ public class PauseMenu : MonoBehaviour {
 	public GUIInfo[] guiInfos;
 	public GUIInfo[] options;
 	
-	Color defaultColor = Color.white;
-	Color selectedColor = Color.gray;
+	Color defaultColor = Color.gray;
+	Color selectedColor = Color.white;
 	int optionNum;
 	bool inputPressed;
 	
@@ -28,10 +28,16 @@ public class PauseMenu : MonoBehaviour {
 		}
 		for(int i = 0; i < options.Length; i++) {
 			GUIInfo info = options[i];
-			newStyle.fontSize = (int)info.fontSize;
 			Vector2 pos = new Vector2(info.posX*Screen.width/100f, (100-info.posY)*Screen.height/100f);
 			guiRect = new Rect(pos.x, pos.y, 0,0);
-			newStyle.normal.textColor = (optionNum != i) ? defaultColor : selectedColor;
+			if(optionNum != i) {
+				newStyle.normal.textColor = defaultColor;
+				newStyle.fontSize = (int)info.fontSize;
+			}
+			else {
+				newStyle.normal.textColor = selectedColor;
+				newStyle.fontSize = (int)info.fontSize + 2;
+			}
 			GUI.Box(guiRect, info.text, newStyle);
 		}
 		

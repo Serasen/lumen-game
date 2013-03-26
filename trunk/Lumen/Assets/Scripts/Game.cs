@@ -2,8 +2,15 @@ using UnityEngine;
 using System.Collections;
 
 enum GameState {
-		PLAY,
-		PAUSE
+	PLAY,
+	GRADUAL_PAUSE,
+	PAUSE
+}
+
+enum LevelActions {
+	CHANGE_ROOM,
+	CHANGE_LEVEL,
+	REENTER_ROOM
 }
 
 public class Game : MonoBehaviour {
@@ -12,6 +19,7 @@ public class Game : MonoBehaviour {
 	public LevelManager levelManager;
 	public DataManager dataManager;
 	public GameObject frontPlanePrefab;
+	[System.NonSerialized] public float frontPlaneOpacity;
 	
 	GameObject frontPlane;
 	PauseMenu pauseMenu;
@@ -28,7 +36,7 @@ public class Game : MonoBehaviour {
 	}
 	
 	void Update() {
-		if(Input.GetKey(KeyCode.P)) {
+		if(Input.GetKey(KeyCode.P) && gameState == (int)GameState.PLAY) {
 			Pause();
 			pauseMenu.enabled = true;
 		}
@@ -37,17 +45,75 @@ public class Game : MonoBehaviour {
 	public void Pause() {
 		Time.timeScale = 0;
 		gameState = (int)GameState.PAUSE;
-		frontPlane.renderer.material.color = Color.black;
-		Camera camera = levelManager.getCamera();
-		float pixelRatio = (camera.orthographicSize * 2) / camera.pixelHeight; 
-		frontPlane.transform.position = camera.transform.position + new Vector3(0,0,0.5f);
-		frontPlane.transform.localScale = new Vector3(pixelRatio*Screen.width, 0f, pixelRatio*Screen.height);
+		frontPlaneOpacity = 0.7f;
+		frontPlane.renderer.material.color = new Color(0,0,0,frontPlaneOpacity);
+		RelocateFrontPlane();
+	}
+	
+	public void RoomTransition(int action, int arg = 0) {
+		if(gameState != (int)GameState.GRADUAL_PAUSE) {
+		gameState = (int)GameState.GRADUAL_PAUSE;
+		StartCoroutine(FadePause(action, arg));
+		}
+	}
+	
+	IEnumerator FadePause(int action, int arg) {
+		
+		float waitTime = 0.02f;
+		
+		GameObject iloTemp = levelManager.getIlo();
+		iloTemp.GetComponent<IloController>().enabled = false;
+		iloTemp.GetComponent<IloShine>().enabled = false;
+		
+		RelocateFrontPlane();
+		
+		while(frontPlaneOpacity < 1) {
+			frontPlaneOpacity += 0.1f;
+			frontPlane.renderer.material.color = new Color(0,0,0,frontPlaneOpacity);
+			yield return new WaitForSeconds(waitTime);
+		}
+		frontPlaneOpacity = 1f;
+		
+		levelManager.getCurrentLevel().getCurrentRoom().gameObject.SetActive(false);
+		switch(action) {
+			case(int) LevelActions.CHANGE_ROOM:
+				levelManager.getCurrentLevel().changeRoom(arg);
+				break;
+			case(int) LevelActions.CHANGE_LEVEL:
+				levelManager.changeLevel(arg);
+				break;
+			case(int) LevelActions.REENTER_ROOM:
+				levelManager.getCurrentLevel().getCurrentRoom().reEnterRoom();
+				break;
+		}
+		
+		RelocateFrontPlane();
+		
+		iloTemp.GetComponent<IloController>().enabled = true;
+		iloTemp.GetComponent<IloShine>().enabled = true;
+		
+		while(frontPlaneOpacity > 0) {
+			frontPlaneOpacity -= 0.1f;
+			frontPlane.renderer.material.color = new Color(0,0,0,frontPlaneOpacity);
+			yield return new WaitForSeconds(waitTime);
+		}
+		frontPlaneOpacity = 0f;
+		gameState = (int)GameState.PLAY;
 	}
 	
 	public void Unpause() {
 		Time.timeScale = 1;
 		gameState = (int)GameState.PLAY;
 		frontPlane.renderer.material.color = Color.clear;
+		frontPlaneOpacity = 0;
+		frontPlane.renderer.material.color = new Color(0,0,0,frontPlaneOpacity);
+	}
+	
+	public void RelocateFrontPlane() {
+		Camera camera = levelManager.getCamera();
+		float pixelRatio = (camera.orthographicSize * 2) / camera.pixelHeight; 
+		frontPlane.transform.position = camera.transform.position + new Vector3(0,0,0.5f);
+		frontPlane.transform.localScale = new Vector3(pixelRatio*Screen.width, 0f, pixelRatio*Screen.height);		
 	}
 	
 	public void ReturnToTitle() {

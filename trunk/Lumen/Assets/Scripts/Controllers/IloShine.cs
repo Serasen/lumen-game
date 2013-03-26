@@ -52,7 +52,7 @@ public class IloShine : MonoBehaviour {
 		}
 		StopCoroutine("FadeDark");
 		StopCoroutine("LoseShine");
-		Game.instance.levelManager.getCurrentLevel().getCurrentRoom().reEnterRoom();
+		Game.instance.RoomTransition((int)LevelActions.REENTER_ROOM);
 	}
 	#endregion
 	

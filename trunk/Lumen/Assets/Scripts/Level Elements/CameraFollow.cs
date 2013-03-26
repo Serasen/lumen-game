@@ -51,8 +51,8 @@ public class CameraFollow : MonoBehaviour {
 		myPosition = transform.position;
 		iloPosition = ilo.transform.position;
 		
-		if(!isIloVisible()) {
-			Game.instance.levelManager.getCurrentLevel().getCurrentRoom().reEnterRoom();
+		if(!isIloVisible() && Game.instance.gameState != (int)GameState.GRADUAL_PAUSE) {
+			Game.instance.RoomTransition((int)LevelActions.REENTER_ROOM);
 		}
 		
 		Vector3 desiredPosition = new Vector3(iloPosition.x,iloPosition.y, myPosition.z);
