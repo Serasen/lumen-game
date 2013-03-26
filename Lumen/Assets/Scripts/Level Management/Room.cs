@@ -64,8 +64,7 @@ public class Room : MonoBehaviour {
 		roomData.keyholes[keyhole] = true;
 		Game.instance.dataManager.SetRoomData(roomData);
 
-		gameObject.SetActive(false);
-		Game.instance.levelManager.getCurrentLevel().changeRoom(keyhole);
+		Game.instance.RoomTransition((int)LevelActions.CHANGE_ROOM, keyhole);
 		
 	}
 	
@@ -74,7 +73,6 @@ public class Room : MonoBehaviour {
 		Game.instance.dataManager.SetRoomData(roomData);
 		
 		latestSpawnPoint = 0;
-		gameObject.SetActive(false);
-		Game.instance.levelManager.changeLevel(levelToEnter);
+		Game.instance.RoomTransition((int)LevelActions.CHANGE_LEVEL, levelToEnter);
 	}
 }
