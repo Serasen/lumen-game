@@ -27,7 +27,6 @@ public class DataManager {
 		if(level >= gameData.levels.Length || 
 			(level > 1 && GetLevelData(level) == null))
 			isUnlocked = false;
-		else Debug.Log("level " + level + " unlocked!");
 		return isUnlocked;
 	}
 	
