@@ -3,14 +3,18 @@ using System.Collections;
 
 public class ShineZone : MonoBehaviour {
 	private float blackoutDuration;
+	private float startIntensity;
+	private float intensityStep = 1/16f;
 	private bool litup = true;
-	private Light thelight;
+	private Light theLight;
 	private Collider ilo;
+	private Smogsworth smogs;
 	
 	void Start() {
 		foreach(Transform child in transform.parent) {
 			if(child.gameObject.name == "Light") {
-				thelight = child.gameObject.light;
+				theLight = child.gameObject.light;
+				startIntensity = theLight.intensity;
 			}
 		}
 	}
@@ -22,10 +26,12 @@ public class ShineZone : MonoBehaviour {
 			}
 		}
 		else if(collider.tag == "Smogsworth") {
-			Smogsworth s = collider.GetComponent<Smogsworth>();
-			blackoutDuration = s.smogAttackDuration;
-			s.SmogAttack();
-			StartCoroutine("Blackout");
+			StopAllCoroutines();
+			smogs = collider.GetComponent<Smogsworth>();
+			smogs.StopAllCoroutines();
+			smogs.rigidbody.velocity = Vector3.zero;
+			blackoutDuration = smogs.smogAttackDuration;
+			StartCoroutine("FadeDark");
 		}
 	}
 	
@@ -37,18 +43,38 @@ public class ShineZone : MonoBehaviour {
 		}
 	}
 	
+	IEnumerator FadeDark() {
+		while(theLight.intensity > 0) {
+			theLight.intensity -= intensityStep;
+			yield return new WaitForSeconds(intensityStep);
+		}
+		theLight.intensity = 0;
+		StartCoroutine("Blackout");
+		StopCoroutine("FadeDark");
+	}
+	
 	IEnumerator Blackout() {
+		smogs.SmogAttack();
 		if(ilo != null) {
 			ilo.GetComponent<IloShine>().EndFadeLight();
 		}
 		litup = false;
-		float temp = thelight.intensity;
-		thelight.intensity = 0;
+		theLight.intensity = 0;
 		yield return new WaitForSeconds(blackoutDuration);
-		thelight.intensity = temp;
 		litup = true;
 		if(ilo != null) {
 			ilo.GetComponent<IloShine>().StartFadeLight();
 		}
+		StartCoroutine("FadeLight");
+		StopCoroutine("Blackout");
+	}
+	
+	IEnumerator FadeLight() {
+		while(theLight.intensity < startIntensity) {
+			theLight.intensity += intensityStep;
+			yield return new WaitForSeconds(intensityStep);
+		}
+		theLight.intensity = startIntensity;
+		StopCoroutine("FadeLight");
 	}
 }

@@ -7,6 +7,7 @@ public class Friend : MonoBehaviour {
 	public Texture2D sprite;
 	private Vector3 bounceVector;
 	private Vector3 startPos;
+	private Collider ilo;
 
 	void Start() {
 		transform.parent.gameObject.renderer.material.SetTexture("_MainTex", sprite);
@@ -16,6 +17,7 @@ public class Friend : MonoBehaviour {
 	
 	void OnTriggerEnter(Collider c) {
 		if(c.tag == "Player") {
+			ilo = c;
 			c.GetComponent<IloController>().enabled = false;
 			c.rigidbody.velocity = Vector3.zero;
 			StartCoroutine("HappyDance");
@@ -42,6 +44,8 @@ public class Friend : MonoBehaviour {
 		transform.parent.rigidbody.velocity = Vector3.zero;
 		
 		transform.parent.position = startPos;
+		
+		ilo.GetComponent<IloController>().enabled = true;
 		
 		StopCoroutine("HappyDance");
 	}

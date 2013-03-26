@@ -26,8 +26,8 @@ public class Smogsworth : MonoBehaviour {
 	}
 	
 	public void SmogAttack() {
-		StopAllCoroutines();
-		rigidbody.velocity = Vector3.zero;
+		//StopAllCoroutines();
+		//rigidbody.velocity = Vector3.zero;
 		StartCoroutine("SmogItUp");
 	}
 	
