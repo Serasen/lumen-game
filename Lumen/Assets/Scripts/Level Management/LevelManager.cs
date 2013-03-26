@@ -13,7 +13,6 @@ public class LevelManager {
 	int levelNumber;
 	GameData gameData;
 	
-	
 	public void initialize() {
 		iloInstance = (GameObject) GameObject.Instantiate(iloPrefab);
 		initializeGameData();
@@ -53,6 +52,21 @@ public class LevelManager {
 			currentLevel = levelInstances[levelNumber];
 		}
 		
+		currentLevel.SetActive(true);
+	}
+	
+	public void ReturnToTitleScreen() {
+		int level = 0;
+		Game.instance.dataManager.ChangeLevel(level);
+		if(currentLevel != null) {
+			currentLevel.SetActive(false);
+		}
+		
+		levelBehavior = null;
+		
+		levelNumber = level;
+		currentLevel = levelInstances[levelNumber];
+		((LevelHub) getCurrentLevel()).setLevelEntered(level);
 		currentLevel.SetActive(true);
 	}
 	

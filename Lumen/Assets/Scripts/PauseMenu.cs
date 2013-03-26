@@ -37,13 +37,22 @@ public class PauseMenu : MonoBehaviour {
 		
 		HandleInput();
 	}
-	
+
 	void HandleInput() {
 		if(Input.GetKeyDown(KeyCode.DownArrow)) {
-			if(optionNum < options.Length - 1) optionNum++;
+			if(!inputPressed && optionNum < options.Length - 1) {
+				optionNum++;
+				inputPressed = true;
+			}
 		}
 		else if(Input.GetKeyDown(KeyCode.UpArrow)) {
-			if(optionNum > 0) optionNum--;
+			if(!inputPressed && optionNum > 0) {
+				optionNum--;
+				inputPressed = true;
+			}
+		}
+		else {
+			inputPressed = false;	
 		}
 		if(Input.GetKeyDown(KeyCode.Return)) {
 			switch(optionNum) {
@@ -52,6 +61,10 @@ public class PauseMenu : MonoBehaviour {
 				Game.instance.Unpause();
 				break;
 			case 1:
+				this.enabled = false;
+				Game.instance.ReturnToTitle();
+				break;
+			case 2:
 				Application.Quit();
 				break;
 			}
