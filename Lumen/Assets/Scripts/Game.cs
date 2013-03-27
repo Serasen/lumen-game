@@ -33,6 +33,32 @@ public class Game : MonoBehaviour {
 		pauseMenu = GetComponent<PauseMenu>();
 		frontPlane = (GameObject) Instantiate(frontPlanePrefab);
 		frontPlane.renderer.material.color = Color.clear;
+		
+		StartCoroutine("StartupFade");
+	}
+	
+	IEnumerator StartupFade() {
+		float waitTime = 0.02f;
+		
+		GameObject iloTemp = levelManager.getIlo();
+		
+		iloTemp.GetComponent<IloController>().enabled = false;
+		iloTemp.GetComponent<IloShine>().enabled = false;
+		frontPlaneOpacity = 1f;
+		frontPlane.renderer.material.color = new Color(0,0,0,frontPlaneOpacity);
+		yield return new WaitForSeconds(1f);
+		
+		iloTemp.GetComponent<IloController>().enabled = true;
+		iloTemp.GetComponent<IloShine>().enabled = true;
+		
+		while(frontPlaneOpacity > 0) {
+			frontPlaneOpacity -= 0.05f;
+			frontPlane.renderer.material.color = new Color(0,0,0,frontPlaneOpacity);
+			yield return new WaitForSeconds(waitTime);
+		}
+		frontPlaneOpacity = 0f;
+		
+		gameState = (int)GameState.PLAY;
 	}
 	
 	void Update() {
@@ -42,6 +68,15 @@ public class Game : MonoBehaviour {
 		}
 	}
 	
+	public void RelocateFrontPlane() {
+		Camera camera = levelManager.getCamera();
+		float pixelRatio = (camera.orthographicSize * 2) / camera.pixelHeight; 
+		frontPlane.transform.position = camera.transform.position + new Vector3(0,0,0.5f);
+		frontPlane.transform.localScale = new Vector3(pixelRatio*Screen.width, 0f, pixelRatio*Screen.height);		
+	}
+	
+	#region Pause
+	
 	public void Pause() {
 		Time.timeScale = 0;
 		gameState = (int)GameState.PAUSE;
@@ -49,6 +84,24 @@ public class Game : MonoBehaviour {
 		frontPlane.renderer.material.color = new Color(0,0,0,frontPlaneOpacity);
 		RelocateFrontPlane();
 	}
+	
+	public void Unpause() {
+		Time.timeScale = 1;
+		gameState = (int)GameState.PLAY;
+		frontPlane.renderer.material.color = Color.clear;
+		frontPlaneOpacity = 0;
+		frontPlane.renderer.material.color = new Color(0,0,0,frontPlaneOpacity);
+	}
+		
+	public void ReturnToTitle() {
+		levelManager.ReturnToTitleScreen();
+		Unpause();
+	}
+	
+	#endregion
+	
+	#region Room Transitions
+	
 	
 	public void RoomTransition(int action, int arg = 0) {
 		if(gameState != (int)GameState.GRADUAL_PAUSE) {
@@ -101,23 +154,5 @@ public class Game : MonoBehaviour {
 		gameState = (int)GameState.PLAY;
 	}
 	
-	public void Unpause() {
-		Time.timeScale = 1;
-		gameState = (int)GameState.PLAY;
-		frontPlane.renderer.material.color = Color.clear;
-		frontPlaneOpacity = 0;
-		frontPlane.renderer.material.color = new Color(0,0,0,frontPlaneOpacity);
-	}
-	
-	public void RelocateFrontPlane() {
-		Camera camera = levelManager.getCamera();
-		float pixelRatio = (camera.orthographicSize * 2) / camera.pixelHeight; 
-		frontPlane.transform.position = camera.transform.position + new Vector3(0,0,0.5f);
-		frontPlane.transform.localScale = new Vector3(pixelRatio*Screen.width, 0f, pixelRatio*Screen.height);		
-	}
-	
-	public void ReturnToTitle() {
-		levelManager.ReturnToTitleScreen();
-		Unpause();
-	}
+	#endregion
 }

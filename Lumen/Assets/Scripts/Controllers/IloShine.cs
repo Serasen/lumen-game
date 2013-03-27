@@ -90,9 +90,10 @@ public class IloShine : MonoBehaviour {
 		StartCoroutine("LoseShine");
 	}
 	#endregion
-	
+	/*
 	void OnGUI() {
 		GUI.Box(new Rect(0, 0, 50, 50), "Shine\n" + shine);
 			
 	}
+	*/
 }
