@@ -1,12 +1,16 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Level : MonoBehaviour {
 	
 	protected LevelManager levelManager;
-
+	
 	public RoomInfo[] rooms;
+	public GameObject[] friends;
 	protected GameObject[] roomInstances;
+	
+	Dictionary<string, int> friendMappings;
 
 	[System.Serializable]
 	public class RoomInfo {
@@ -28,6 +32,11 @@ public class Level : MonoBehaviour {
 	
 	protected void Awake () {
 		roomInstances = new GameObject[rooms.Length];
+		friendMappings = new Dictionary<string, int>(friends.Length);
+		for(int i = 0; i < friends.Length; i++) {
+			friendMappings.Add(friends[i].name, i);
+		}
+		
 	}
 	
 	protected virtual void OnEnable() {
@@ -38,7 +47,7 @@ public class Level : MonoBehaviour {
 	public void initializeLevelData() {
 		levelData = Game.instance.dataManager.GetLevelData();
 		if(levelData == null || levelData.rooms == null) {
-			levelData = new LevelData(rooms.Length);
+			levelData = new LevelData(rooms.Length, friends.Length);
 			Game.instance.dataManager.SetLevelData(levelData);
 		}		
 	}

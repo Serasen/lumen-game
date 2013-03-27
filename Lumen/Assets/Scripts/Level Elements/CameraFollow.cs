@@ -12,16 +12,17 @@ public class CameraFollow : MonoBehaviour {
 	Vector3 iloPosition;
 	Vector3 myPosition;
 	
+		
+	bool lockUp;
+	bool lockDown;
+	bool lockLeft;
+	bool lockRight;
+	
 	void Start() {
 		ilo = Game.instance.levelManager.getIlo();
 		controller = ilo.GetComponent<IloController>();	
 		OnEnable();
 	}
-	
-		bool lockUp = false;
-		bool lockDown = false;
-		bool lockLeft = false;
-		bool lockRight = false;
 	
 	void OnEnable() {
 		
