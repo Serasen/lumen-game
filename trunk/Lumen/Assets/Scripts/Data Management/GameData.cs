@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 
@@ -38,6 +39,7 @@ public class GameData : ISerializable {
 [Serializable ()]
 public class LevelData : ISerializable {
 	public RoomData[] rooms;
+	public bool[] friendsSaved;
 	public bool unlocked;
 	public int deaths;
 	
@@ -45,13 +47,15 @@ public class LevelData : ISerializable {
 	public LevelData () {
 		deaths = 0;
 	}
-	public LevelData(int numRooms) : this() {
+	public LevelData(int numRooms, int friends) : this() {
 		rooms = new RoomData[numRooms];	
+		friendsSaved = new bool[friends];
 	}
 	public LevelData (SerializationInfo info, StreamingContext ctxt)
 	{
 		rooms = (RoomData[])info.GetValue("rooms", typeof(RoomData[]));
 		deaths = (int)info.GetValue("deaths", typeof(int));
+		friendsSaved = (bool[])info.GetValue("friendsSaved", typeof(bool[]));
 	}
 	
 	public int GetNumReachedRooms() {
@@ -82,11 +86,20 @@ public class LevelData : ISerializable {
 		return keyholes;
 		
 	}
+	
+	public int GetNumSavedFriends() {
+		int savedFriends = 0;
+		foreach(bool saved in friendsSaved) {
+			if(saved) savedFriends++;
+		}
+		return savedFriends; 	
+	}
  
 	public void GetObjectData (SerializationInfo info, StreamingContext ctxt)
 	{
 		info.AddValue("rooms", rooms);
 		info.AddValue("deaths", deaths);
+		info.AddValue("friendsSaved", friendsSaved);
 	}	
 }
 
