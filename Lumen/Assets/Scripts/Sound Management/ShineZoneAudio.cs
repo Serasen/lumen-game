@@ -3,10 +3,7 @@ using System.Collections;
 
 public class ShineZoneAudio : MonoBehaviour {
 	
-	float audioTime;
-	
 	void Start() {
-		audioTime = 0f;	
 		audio.loop = true;
 	}
 	
