@@ -13,6 +13,8 @@ public class IloController : MonoBehaviour {
 	public float runSpeed;
 	public float jumpSpeed;
 	
+	IloAudio audioController;
+	
 	enum STATE {
 		WALKING,
 		JUMPING,
@@ -27,6 +29,10 @@ public class IloController : MonoBehaviour {
 	const float maxDescentAngle = 60f;
 	//cannot jump up to a surface angle this close to original surface
 	const float minTransferAngle = 15f;
+	
+	void Start() {
+		audioController = GetComponent<IloAudio>();
+	}
 
 	// Use this for initialization
 	void OnEnable () {
@@ -89,6 +95,11 @@ public class IloController : MonoBehaviour {
 	}
 	
 	#region walking
+	
+	public void initiateWalk() {
+		state = (int)STATE.WALKING;
+	}
+	
 	void Walk_Update() {
 		float input = GetInput();
 		
@@ -129,6 +140,8 @@ public class IloController : MonoBehaviour {
 	
 		
 	public void initiateJump() {
+		audioController.playClip((int)Audio.JUMP_BEGIN);
+		
 		Vector3 leanDirection = GetInput() * transform.right;
 		if(Physics.Raycast(transform.position, leanDirection, transform.localScale.y*0.5f)) {
 			jumpVector = surfaceNormal;
@@ -162,7 +175,7 @@ public class IloController : MonoBehaviour {
 			if(collision.gameObject.tag != "Mirror") {
 				surfaceNormal = contactNormal;
 				transform.rotation = Quaternion.FromToRotation(Vector3.up, surfaceNormal);
-				state = (int)STATE.WALKING;
+				initiateWalk();
 			}
 			else {	
 				initiateReflect(hit.normal);
@@ -197,7 +210,7 @@ public class IloController : MonoBehaviour {
 				transform.rotation = Quaternion.FromToRotation(Vector3.up, surfaceNormal);
 				reverseHorizontalInput = Vector3.Angle(transform.up, Vector3.up) > 95f;
 				reverseVerticalInput = transform.right.y < 0;
-				state = (int)STATE.WALKING;
+				initiateWalk();
 			}
 			else {	
 				initiateReflect(hit.normal);
@@ -209,6 +222,7 @@ public class IloController : MonoBehaviour {
 	#region reflecting
 	
 	public void initiateReflect(Vector3 hitNormal) {
+		audioController.playClip((int)Audio.JUMP_BEGIN);
 		surfaceNormal = hitNormal;
 		transform.up = surfaceNormal;
 		jumpVector = Vector3.Reflect(-jumpVector, transform.right).normalized*jumpSpeed;
