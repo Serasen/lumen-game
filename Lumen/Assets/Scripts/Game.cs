@@ -24,6 +24,8 @@ public class Game : MonoBehaviour {
 	GameObject frontPlane;
 	PauseMenu pauseMenu;
 	
+	
+	
 	[System.NonSerialized] public int gameState;
 	
 	void Start() {
@@ -153,6 +155,14 @@ public class Game : MonoBehaviour {
 		frontPlaneOpacity = 0f;
 		gameState = (int)GameState.PLAY;
 	}
+	
+	#endregion
+	
+	#region Audio
+	
+	public AudioClip getAudioClip() {return audio.clip;}
+	
+	public float getAudioTime() {return audio.time;}	
 	
 	#endregion
 }
