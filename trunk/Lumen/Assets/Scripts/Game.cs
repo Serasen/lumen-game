@@ -10,7 +10,8 @@ enum GameState {
 enum LevelActions {
 	CHANGE_ROOM,
 	CHANGE_LEVEL,
-	REENTER_ROOM
+	REENTER_ROOM,
+	RETURN_TO_TITLE,
 }
 
 public class Game : MonoBehaviour {
@@ -94,14 +95,15 @@ public class Game : MonoBehaviour {
 	public void Unpause() {
 		Time.timeScale = 1;
 		gameState = (int)GameState.PLAY;
-		frontPlane.renderer.material.color = Color.clear;
 		frontPlaneOpacity = 0;
 		frontPlane.renderer.material.color = new Color(0,0,0,frontPlaneOpacity);
 	}
 		
 	public void ReturnToTitle() {
-		levelManager.ReturnToTitleScreen();
-		Unpause();
+		Time.timeScale = 1;
+		frontPlaneOpacity = 0;
+		frontPlane.renderer.material.color = new Color(0,0,0,frontPlaneOpacity);	
+		RoomTransition((int)LevelActions.RETURN_TO_TITLE);
 	}
 	
 	#endregion
@@ -122,7 +124,6 @@ public class Game : MonoBehaviour {
 	}
 	
 	IEnumerator FadePause(int action, int arg) {
-		
 		float waitTime = 0.02f;
 		
 		GameObject iloTemp = levelManager.getIlo();
@@ -149,18 +150,24 @@ public class Game : MonoBehaviour {
 			case(int) LevelActions.REENTER_ROOM:
 				levelManager.getCurrentLevel().getCurrentRoom().reEnterRoom();
 				break;
+			case(int) LevelActions.RETURN_TO_TITLE:
+				levelManager.ReturnToTitleScreen();
+				break;
 		}
 		
 		RelocateFrontPlane();
 		
 		iloTemp.GetComponent<IloController>().enabled = true;
 		iloTemp.GetComponent<IloShine>().enabled = true;
-		
+
 		while(frontPlaneOpacity > 0) {
 			frontPlaneOpacity -= 0.1f;
 			frontPlane.renderer.material.color = new Color(0,0,0,frontPlaneOpacity);
 			yield return new WaitForSeconds(waitTime);
 		}
+		
+		
+		
 		frontPlaneOpacity = 0f;
 		gameState = (int)GameState.PLAY;
 	}
