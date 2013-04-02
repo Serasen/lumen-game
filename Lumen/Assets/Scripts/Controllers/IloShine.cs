@@ -11,18 +11,22 @@ public class IloShine : MonoBehaviour {
 	float rangeStep;
 	
 	Light iloLight;
+	bool inShineZone;
 	
 	void Awake() {
 		iloLight = gameObject.GetComponentInChildren<Light>();
 		rangeStep = 1/16f;
+		inShineZone = false;
 	}
 	
 	// Use this for initialization
 	void OnEnable () {
 		shine = maxShine;
 		iloLight.range = maxRange;
-		StartCoroutine("FadeDark");
-		StartCoroutine("LoseShine");
+		if(!inShineZone) {
+			StartCoroutine("FadeDark");
+			StartCoroutine("LoseShine");
+		}
 	}
 	
 	void OnDisable() {
@@ -59,6 +63,7 @@ public class IloShine : MonoBehaviour {
 	#region gain shine
 	
 	public void StartFadeLight() {
+		inShineZone = true;
 		StopCoroutine("FadeDark");
 		StopCoroutine("LoseShine");
 		StartCoroutine("fadeUpShine");
@@ -84,6 +89,7 @@ public class IloShine : MonoBehaviour {
 	}
 	
 	public void EndFadeLight() {
+		inShineZone = false;
 		StopCoroutine("fadeUpShine");
 		StopCoroutine("fadeUpRange");
 		StartCoroutine("FadeDark");
