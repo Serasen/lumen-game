@@ -35,7 +35,9 @@ public class LevelManager {
 		Game.instance.dataManager.ChangeLevel(level);
 		if(currentLevel != null) {
 			//Tell LevelHub where to return
-			if(levelNumber == 0) ((LevelHub) getCurrentLevel()).setLevelEntered(level);
+			if(levelNumber == 0) {
+				((LevelHub) getCurrentLevel()).setLevelEntered(level);
+			}
 			currentLevel.SetActive(false);
 		}
 		
