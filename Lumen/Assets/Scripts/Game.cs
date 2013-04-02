@@ -21,6 +21,10 @@ public class Game : MonoBehaviour {
 	public GameObject frontPlanePrefab;
 	[System.NonSerialized] public float frontPlaneOpacity;
 	
+	//audio sources
+	public AudioSource backgroundMusic;
+	public AudioSource deathAudio;
+	
 	GameObject frontPlane;
 	PauseMenu pauseMenu;
 	
@@ -106,9 +110,14 @@ public class Game : MonoBehaviour {
 	
 	
 	public void RoomTransition(int action, int arg = 0) {
+		
+		if(action == (int)LevelActions.REENTER_ROOM) {
+			deathAudio.Play();
+		}
+		
 		if(gameState != (int)GameState.GRADUAL_PAUSE) {
-		gameState = (int)GameState.GRADUAL_PAUSE;
-		StartCoroutine(FadePause(action, arg));
+			gameState = (int)GameState.GRADUAL_PAUSE;
+			StartCoroutine(FadePause(action, arg));
 		}
 	}
 	
