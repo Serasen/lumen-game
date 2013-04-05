@@ -13,7 +13,7 @@ public class LevelDisplayText : FadeText {
 		guiInfos[0].text = "Level " + levelToDisplay;
 		if(guiInfos.Length > 2 && levelData != null && levelData.rooms != null) {
 			guiInfos[1].text = GetRoomProgress();
-			guiInfos[2].text = "Deaths: " + levelData.deaths;
+			guiInfos[2].text = "Friends Saved: " + levelData.GetNumSavedFriends();
 		}
 		else {
 			guiInfos[1].text = "";	

@@ -34,9 +34,8 @@ public class Level : MonoBehaviour {
 		roomInstances = new GameObject[rooms.Length];
 		friendMappings = new Dictionary<string, int>(friends.Length);
 		for(int i = 0; i < friends.Length; i++) {
-			friendMappings.Add(friends[i].name, i);
+			friendMappings.Add(friends[i].gameObject.name, i);
 		}
-		
 	}
 	
 	protected virtual void OnEnable() {
@@ -91,5 +90,14 @@ public class Level : MonoBehaviour {
 	
 	public int getCurrentRoomNumber() {
 		return roomNumber;	
+	}
+	
+	//Returns whether a friend has been discovered yet
+	public bool getFriendStatus(string name) {
+		return levelData.friendsSaved[friendMappings[name]];
+	}
+	
+	public void savedFriend(string name) {
+		levelData.friendsSaved[friendMappings[name]] = true;	
 	}
 }
