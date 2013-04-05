@@ -13,10 +13,11 @@ public class FriendBounce : MonoBehaviour {
 	}
 
 	void OnCollisionEnter(Collision c) {
+		StopCoroutine("Bouncer");
 		if(bouncesLeft > 0) {
 			rigidbody.velocity = Vector3.zero;
 			bounceVector *= -1;
-			Bounce ();
+			StartCoroutine("Bouncer");
 			bouncesLeft--;
 		}
 		else {
@@ -24,7 +25,15 @@ public class FriendBounce : MonoBehaviour {
 		}
 	}
 	
+	IEnumerator Bouncer() {
+		while(rigidbody.velocity.magnitude < bounceVector.magnitude) {
+			rigidbody.AddForce(bounceVector, ForceMode.Acceleration);
+			yield return new WaitForSeconds(0.1f);
+		}
+	}
+	
 	public void Bounce() {
-		rigidbody.AddForce(bounceVector);
+		StopCoroutine("Bouncer");
+		StartCoroutine("Bouncer");
 	}
 }

@@ -5,6 +5,7 @@ public class Friend : MonoBehaviour {
 	public float maxRange;	
 	public Texture2D sprite;
 	
+	private Level myLevel;
 	private float rangeStep = 2/16f;
 	private Light friendLight;
 	private float startRange;
@@ -12,8 +13,10 @@ public class Friend : MonoBehaviour {
 
 	void Start() {
 		transform.parent.gameObject.renderer.material.SetTexture("_MainTex", sprite);
+		myLevel = Game.instance.levelManager.getCurrentLevel();
 		friendLight = transform.parent.GetComponentInChildren<Light>();
 		startRange = friendLight.range;
+		unhappy = !myLevel.getFriendStatus(transform.parent.name);
 	}
 	
 	void OnTriggerEnter(Collider c) {
@@ -32,6 +35,7 @@ public class Friend : MonoBehaviour {
 	
 	private void GetHappy() {
 		unhappy = false;
+		myLevel.savedFriend(transform.parent.name);
 		transform.parent.gameObject.renderer.material.SetTextureOffset("_MainTex", new Vector2(0,0));
 		transform.parent.GetComponent<FriendBounce>().Bounce ();
 	}
