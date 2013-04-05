@@ -17,6 +17,10 @@ public class Friend : MonoBehaviour {
 		friendLight = transform.parent.GetComponentInChildren<Light>();
 		startRange = friendLight.range;
 		unhappy = !myLevel.getFriendStatus(transform.parent.name);
+		if(!unhappy) {
+			friendLight.range = maxRange;
+			transform.parent.gameObject.renderer.material.SetTextureOffset("_MainTex", new Vector2(0,0));
+		}
 	}
 	
 	void OnTriggerEnter(Collider c) {
