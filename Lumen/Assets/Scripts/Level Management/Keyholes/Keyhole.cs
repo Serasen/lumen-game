@@ -18,5 +18,4 @@ public class Keyhole : MonoBehaviour {
 			myRoom.keyholeReached(keyholeNum);
 		}
 	}
-	
 }
