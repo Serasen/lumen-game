@@ -24,7 +24,7 @@ public class FadeText : Text {
 		}
 	}
 	
-	protected IEnumerator fadeInText() {
+	protected virtual IEnumerator fadeInText() {
 		while(alphaValue < 1f) {
         	yield return new WaitForSeconds(0.01f);
 			alphaValue += 0.1f;

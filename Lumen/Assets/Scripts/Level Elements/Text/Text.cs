@@ -1,13 +1,13 @@
 using UnityEngine;
 using System.Collections;
 
-	[System.Serializable]
-	public class GUIInfo {
-		public string text;
-		public float fontSize;
-		public float posX;
-		public float posY;
-	}
+[System.Serializable]
+public class GUIInfo {
+	public string text;
+	public float fontSize;
+	public float posX;
+	public float posY;
+}
 
 public class Text : MonoBehaviour {
 		
@@ -19,7 +19,7 @@ public class Text : MonoBehaviour {
 	public GUIInfo[] guiInfos;
 	protected GUIStyle style;
 	
-	protected void Start() {
+	protected virtual void Start() {
 		style = new GUIStyle();	
 	}
 	
@@ -34,17 +34,7 @@ public class Text : MonoBehaviour {
 	protected virtual void OnGUI() {
 		float nowAlpha;
 		if(alphaValue > 0f) {
-			switch(Game.instance.gameState) {
-				case (int)GameState.PAUSE: 
-					nowAlpha = 0f;
-					break;
-				case (int)GameState.GRADUAL_PAUSE: 
-					nowAlpha = Mathf.Min(alphaValue, 1 - Game.instance.frontPlaneOpacity);
-					break;
-				default: 
-					nowAlpha = alphaValue; 
-					break;
-			}
+			nowAlpha = getNowAlpha();
 			float pixelRatio = (mainCamera.orthographicSize * 2) / mainCamera.pixelHeight;
 			style.alignment = TextAnchor.UpperCenter;
 			style.normal.textColor = new Color(1,1,1,nowAlpha);
@@ -57,5 +47,21 @@ public class Text : MonoBehaviour {
 				GUI.Box(guiRect, elem.text, style);
 			}
 		}
+	}
+	
+	protected float getNowAlpha() {
+		float nowAlpha;
+		switch(Game.instance.gameState) {
+			case (int)GameState.PAUSE: 
+				nowAlpha = 0f;
+				break;
+			case (int)GameState.GRADUAL_PAUSE: 
+				nowAlpha = Mathf.Min(alphaValue, 1 - Game.instance.frontPlaneOpacity);
+				break;
+			default: 
+				nowAlpha = alphaValue; 
+				break;
+		}
+		return nowAlpha;
 	}
 }
