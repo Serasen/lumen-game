@@ -6,6 +6,8 @@ public class IloController : MonoBehaviour {
 	Vector3 surfaceNormal; //normal of surface currently occupied
 	Vector3 jumpVector;
 	
+	Vector2 textureScale = new Vector2(1,1);
+	
 	//float input;
 	bool reverseHorizontalInput;
 	bool reverseVerticalInput;
@@ -63,10 +65,14 @@ public class IloController : MonoBehaviour {
 		else {
 			input = horizontalInput * (reverseHorizontalInput ? -1 : 1);
 		}
-		if(input == 1)
-			renderer.material.SetTextureScale("_MainTex", new Vector2(input, 1));
-		else if (input == -1)
-			renderer.material.SetTextureScale("_MainTex", new Vector2(-.85f,1));
+		if(input == 1) {
+			textureScale.Set (1,1);
+			renderer.material.SetTextureScale("_MainTex", textureScale);
+		}
+		else if (input == -1) {
+			textureScale.Set(-.85f,1);
+			renderer.material.SetTextureScale("_MainTex", textureScale);
+		}
 		return input;
 	}
 	
