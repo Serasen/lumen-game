@@ -65,11 +65,11 @@ public class IloController : MonoBehaviour {
 		else {
 			input = horizontalInput * (reverseHorizontalInput ? -1 : 1);
 		}
-		if(input == 1) {
+		if(input > 0) {
 			textureScale.Set (1,1);
 			renderer.material.SetTextureScale("_MainTex", textureScale);
 		}
-		else if (input == -1) {
+		else if (input < 0) {
 			textureScale.Set(-.85f,1);
 			renderer.material.SetTextureScale("_MainTex", textureScale);
 		}
