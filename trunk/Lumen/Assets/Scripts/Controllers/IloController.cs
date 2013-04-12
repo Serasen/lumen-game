@@ -4,9 +4,9 @@ using System.Collections;
 public class IloController : MonoBehaviour {
 	
 	Vector3 surfaceNormal; //normal of surface currently occupied
-	Vector3 jumpVector;
-	
+	Vector3 jumpVector;	
 	Vector2 textureScale = new Vector2(1,1);
+	Vector2 textureOffset = new Vector2(.5f,0);
 	
 	//float input;
 	bool reverseHorizontalInput;
@@ -14,7 +14,7 @@ public class IloController : MonoBehaviour {
 	
 	public float runSpeed;
 	public float jumpSpeed;
-	
+		
 	IloAudio audioController;
 	
 	enum STATE {
@@ -44,7 +44,6 @@ public class IloController : MonoBehaviour {
 		
 		surfaceNormal = transform.up;
 		jumpVector = -transform.up;
-		
 	}
 	
 	void OnDisable () {
@@ -66,12 +65,14 @@ public class IloController : MonoBehaviour {
 			input = horizontalInput * (reverseHorizontalInput ? -1 : 1);
 		}
 		if(input > 0) {
-			textureScale.Set (1,1);
+			textureScale.Set (.5f,1);
 			renderer.material.SetTextureScale("_MainTex", textureScale);
+			renderer.material.SetTextureOffset("_MainTex", Vector2.zero);
 		}
 		else if (input < 0) {
-			textureScale.Set(-.85f,1);
+			textureScale.Set(-.44f,1);
 			renderer.material.SetTextureScale("_MainTex", textureScale);
+			renderer.material.SetTextureOffset("_MainTex", textureOffset);
 		}
 		return input;
 	}
@@ -112,7 +113,7 @@ public class IloController : MonoBehaviour {
 	
 	void Walk_Update() {
 		float input = GetInput();
-		
+						
 		RaycastHit hit;
 		if(Physics.Raycast(transform.position, -surfaceNormal, out hit, transform.localScale.y*2) &&
 			Vector3.Angle(surfaceNormal, hit.normal) < maxDescentAngle) 
@@ -190,7 +191,7 @@ public class IloController : MonoBehaviour {
 			else {	
 				initiateReflect(hit.normal);
 			}			
-		}	
+		}
 	}
 	#endregion
 	
