@@ -9,7 +9,6 @@ public class Smogsworth : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-
 		rigidbody.velocity = RandomDir();
 		StartCoroutine("MoveAbout");
 	}
