@@ -2,36 +2,32 @@ using UnityEngine;
 using System.Collections;
 
 public class Sludge : MonoBehaviour {
-	public float duration;
-	private IloController ic;
-	private Material iloMat;
-	private Vector2 offset = new Vector2(.5f,0);
+	public float liveDuration;
+	public float stickDuration;
 	
 	void Start () {
-		Destroy (this.gameObject, duration);
+		StartCoroutine("Die");
 	}
 	
 	void OnTriggerEnter(Collider collider) {
 		if(collider.tag == "Player") {
-			ic = collider.GetComponent<IloController>();
-			iloMat = collider.renderer.material;
+			collider.GetComponent<IloMeta>().DisableController(stickDuration);
+			audio.Play();
 			collider.gameObject.transform.rotation = transform.rotation;
-			Stickem();
 		}
 	}
 	
-	void OnDisable() {
-		if(ic != null) {
-			ic.enabled = true;
-			iloMat.SetTextureOffset("_MainTex", iloMat.GetTextureOffset("_MainTex") - offset);
-		}
+	IEnumerator Die() {
+		yield return new WaitForSeconds(liveDuration);
+		StartCoroutine("Shrink");
 	}
 	
-	void Stickem() {
-		//yield return new WaitForSeconds(.1f);
-		audio.Play ();
-		ic.enabled = false;
-		iloMat.SetTextureOffset("_MainTex", iloMat.GetTextureOffset("_MainTex") + offset);
+	IEnumerator Shrink() {
+		while(transform.localScale.y > 0) {
+			transform.localScale -= Vector3.up * .1f;
+			transform.position -= transform.up * .07f;
+			yield return new WaitForSeconds(.2f);
+		}
+		Destroy(this.gameObject);
 	}
-
 }
