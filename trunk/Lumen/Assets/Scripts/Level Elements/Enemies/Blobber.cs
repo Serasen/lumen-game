@@ -17,13 +17,19 @@ public class Blobber : MonoBehaviour {
 		StartCoroutine("Jump");
 	}
 	void OnCollisionEnter(Collision collision) {
-		Vector3 eulerAngles = Quaternion.FromToRotation(Vector3.up, collision.contacts[0].normal).eulerAngles;
-		transform.eulerAngles = new Vector3(0, 0, eulerAngles.z);
-		rigidbody.velocity = Vector3.zero;
-		rigidbody.angularVelocity = Vector3.zero;
-		rigidbody.Sleep();
-		StartCoroutine("Jump");
-		audio.Play ();
+		if(collision.gameObject.tag == "Player") {
+			collision.gameObject.transform.GetComponentInChildren<Light>().range = 0;
+			Game.instance.RoomTransition((int)LevelActions.REENTER_ROOM);
+		}
+		else {
+			Vector3 eulerAngles = Quaternion.FromToRotation(Vector3.up, collision.contacts[0].normal).eulerAngles;
+			transform.eulerAngles = new Vector3(0, 0, eulerAngles.z);
+			rigidbody.velocity = Vector3.zero;
+			rigidbody.angularVelocity = Vector3.zero;
+			rigidbody.Sleep();
+			StartCoroutine("Jump");
+			audio.Play ();
+		}
 	}
 	
 	IEnumerator Jump() {
