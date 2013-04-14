@@ -3,7 +3,8 @@ using System.Collections;
 
 public class OscillateFadeText : FadeText {
 	
-	int activeText;
+	public float waitTime;
+	protected int activeText;
 	
 	protected override void OnEnable() {
 		activeText = 0;
@@ -16,12 +17,12 @@ public class OscillateFadeText : FadeText {
      	   		yield return new WaitForSeconds(0.01f);
 				alphaValue += 0.1f;
 			}
-			yield return new WaitForSeconds(0.5f);
+			yield return new WaitForSeconds(waitTime);
 			while(alphaValue > 0f) {
       	  		yield return new WaitForSeconds(0.01f);
 				alphaValue -= 0.1f;
 			}
-			yield return new WaitForSeconds(0.5f);
+			yield return new WaitForSeconds(waitTime);
 			
 			activeText++;
 			if(activeText == guiInfos.Length) activeText = 0;
