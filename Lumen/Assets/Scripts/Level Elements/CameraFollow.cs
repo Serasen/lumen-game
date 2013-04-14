@@ -12,7 +12,7 @@ public class CameraFollow : MonoBehaviour {
 	Vector3 iloPosition;
 	Vector3 myPosition;
 	
-		
+	bool locked;
 	bool lockUp;
 	bool lockDown;
 	bool lockLeft;
@@ -20,15 +20,15 @@ public class CameraFollow : MonoBehaviour {
 	
 	void Start() {
 		ilo = Game.instance.levelManager.getIlo();
-		controller = ilo.GetComponent<IloController>();	
+		controller = ilo.GetComponent<IloController>();
 		OnEnable();
 	}
 	
 	void OnEnable() {
-		
 		isWaitingToExpand = false;
 		isReturning = false;
 		
+		locked = false;
 		lockUp = false;
 		lockDown = false;
 		lockLeft = false;
@@ -57,13 +57,14 @@ public class CameraFollow : MonoBehaviour {
 		}
 		
 		Vector3 desiredPosition = new Vector3(iloPosition.x,iloPosition.y, myPosition.z);
-		if((lockLeft && desiredPosition.x < myPosition.x) ||
-		   (lockRight && desiredPosition.x > myPosition.x))
-				desiredPosition.x = myPosition.x;
-		if((lockDown && desiredPosition.y < myPosition.y) ||
-		   (lockUp && desiredPosition.y > myPosition.y))
-				desiredPosition.y = myPosition.y;
-		
+		if(locked) {
+			if(	(lockLeft && desiredPosition.x < myPosition.x) ||
+		   		(lockRight && desiredPosition.x > myPosition.x))
+					desiredPosition.x = myPosition.x;
+			if((lockDown && desiredPosition.y < myPosition.y) ||
+		   		(lockUp && desiredPosition.y > myPosition.y))
+					desiredPosition.y = myPosition.y;
+		}
 		transform.position = Vector3.Lerp(myPosition, desiredPosition, Time.deltaTime*followSpeed);
 	}
 	
@@ -73,30 +74,19 @@ public class CameraFollow : MonoBehaviour {
 		float scaleY = transform.localScale.y/2;
 		if(Physics.Raycast(pos,transform.up, scaleY)) {
 			lockUp = true;
+			locked = true;
 		}
 		if(Physics.Raycast(pos,-transform.up, scaleY)) {
-			lockDown = true;	
+			lockDown = true;
+			locked = true;
 		}
 		if(Physics.Raycast(pos,transform.right, scaleX)) {
-			lockRight = true;	
+			lockRight = true;
+			locked = true;
 		}
 		if(Physics.Raycast(pos,-transform.right, scaleX)) {
-			lockLeft = true;	
-		}
-	}
-	
-	void OnCollisionExit(Collision collision) {
-		ContactPoint contact = collision.contacts[0];
-		int x = Mathf.RoundToInt(contact.normal.x);
-		int y = Mathf.RoundToInt(contact.normal.y);
-		Debug.Log(x + " " + y);
-		if(x != 0) {
-			if(x > 0) lockLeft = false;
-			else lockRight = false;
-		}
-		else {
-			if(y > 0) lockDown = false;
-			else lockUp = false;
+			lockLeft = true;
+			locked = true;
 		}
 	}
 	
@@ -116,6 +106,7 @@ public class CameraFollow : MonoBehaviour {
 		if(!Physics.Raycast(pos,-transform.right, scaleX)) {
 			lockLeft = false;	
 		}
+		if(!lockLeft && !lockRight && !lockUp && !lockDown) locked = false;
 	}
 	
 	#region adjust camera size
@@ -166,10 +157,9 @@ public class CameraFollow : MonoBehaviour {
 	bool isIloVisible() {
 		Vector3 viewPos = camera.WorldToViewportPoint(ilo.transform.position);
 		bool isVisible = true;
-		if((lockLeft && viewPos.x < 0) || 
-			(lockRight && viewPos.x > 1) ||
-			(lockDown && viewPos.y < 0) ||
-			(lockUp && viewPos.y > 1)) {
+		if(locked && 
+			((viewPos.x < 0) || (viewPos.x > 1) ||
+			(viewPos.y < 0) || (viewPos.y > 1))) {
 			isVisible = false;
 		}
 		return isVisible;

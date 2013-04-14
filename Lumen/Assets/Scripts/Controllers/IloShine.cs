@@ -11,7 +11,7 @@ public class IloShine : MonoBehaviour {
 	float rangeStep;
 	
 	Light iloLight;
-	bool inShineZone;
+	bool inShineZone; //Resolves script execution order bug when Ilo is spawned in a shine zone
 	
 	void Awake() {
 		iloLight = gameObject.GetComponentInChildren<Light>();
@@ -30,6 +30,7 @@ public class IloShine : MonoBehaviour {
 	}
 	
 	void OnDisable() {
+		inShineZone = false;
 		StopCoroutine("FadeDark");
 		StopCoroutine("LoseShine");
 	}
