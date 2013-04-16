@@ -28,12 +28,13 @@ public class Blobber : MonoBehaviour {
 			rigidbody.angularVelocity = Vector3.zero;
 			rigidbody.Sleep();
 			StartCoroutine("Jump");
-			audio.Play ();
+			//audio.Play ();
 		}
 	}
 	
 	IEnumerator Jump() {
 		yield return new WaitForSeconds(jumpPeriod);
+		audio.Play();
 		int dir = Random.Range(LEFT, RIGHT+1);
 		if(dir == LEFT) {
 			rigidbody.velocity = (transform.up - transform.right*Random.Range(minAngle,maxAngle))*speed;
