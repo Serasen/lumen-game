@@ -8,14 +8,14 @@ public class Smogsworth : MonoBehaviour {
 	private Vector3 randomDir = new Vector3();
 	
 	// Use this for initialization
-	void Start () {
+	void OnEnable () {
 		rigidbody.velocity = RandomDir();
 		StartCoroutine("MoveAbout");
+		renderer.enabled = true;
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
+	void OnDisable() {
+		StopAllCoroutines();
 	}
 	
 	void OnCollisionEnter(Collision c) {

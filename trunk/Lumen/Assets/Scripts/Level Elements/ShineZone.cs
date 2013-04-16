@@ -43,6 +43,12 @@ public class ShineZone : MonoBehaviour {
 		}
 	}
 	
+	void OnDisable() {
+		StopAllCoroutines();
+		if(theLight != null)
+			theLight.intensity = startIntensity;
+	}
+	
 	IEnumerator FadeDark() {
 		while(theLight.intensity > 0) {
 			theLight.intensity -= intensityStep;
