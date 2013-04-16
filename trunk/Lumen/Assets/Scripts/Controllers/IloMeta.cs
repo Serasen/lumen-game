@@ -10,6 +10,7 @@ public class IloMeta : MonoBehaviour {
 	void Start () {
 		iloControl = gameObject.GetComponent<IloController>();
 	}
+
 	
 	public void DisableController(float t) {
 		disableTime = t;
@@ -21,6 +22,6 @@ public class IloMeta : MonoBehaviour {
 		renderer.material.SetTextureOffset("_MainTex", renderer.material.GetTextureOffset("_MainTex") + offset);
 		yield return new WaitForSeconds(disableTime);
 		iloControl.enabled = true;
-		renderer.material.SetTextureOffset("_MainTex", renderer.material.GetTextureOffset("_MainTex") - offset);
+		renderer.material.SetTextureOffset("_MainTex", Vector2.zero);
 	}
 }
