@@ -48,7 +48,7 @@ public class CameraFollow : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
 		myPosition = transform.position;
 		iloPosition = ilo.transform.position;
 		
@@ -116,9 +116,11 @@ public class CameraFollow : MonoBehaviour {
 	
 	void AdjustCameraSize() {
 		
-		if(controller.isJumping() && camera.orthographicSize < initialSize*2) {
-			if(!isWaitingToExpand) {
-				StartCoroutine("IncreaseCameraSize");
+		if(controller.isAirborne()) {
+			if(camera.orthographicSize < initialSize*2) {
+				if(!isWaitingToExpand) {
+					StartCoroutine("IncreaseCameraSize");
+				}
 			}
 		}
 		else if(!isReturning){
@@ -133,7 +135,7 @@ public class CameraFollow : MonoBehaviour {
 		yield return new WaitForSeconds(1);
 		isReturning = false;
 		StopCoroutine("ResetCameraSize");
-		while(controller.isJumping() && camera.orthographicSize < initialSize*2) {
+		while(camera.orthographicSize < initialSize*2) {
 			yield return new WaitForSeconds(1/60f);
 			camera.orthographicSize += 0.1f;
 		}
@@ -142,7 +144,7 @@ public class CameraFollow : MonoBehaviour {
 	IEnumerator ResetCameraSize() {
 		isReturning = true;
 		while(camera.orthographicSize > initialSize) {
-			yield return new WaitForSeconds(1/60f);
+			yield return new WaitForSeconds(1/120f);
 			camera.orthographicSize -= 0.2f;
 		}	
 	}
