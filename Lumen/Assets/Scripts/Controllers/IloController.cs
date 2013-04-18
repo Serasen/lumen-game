@@ -14,6 +14,7 @@ public class IloController : MonoBehaviour {
 	
 	public float runSpeed;
 	public float jumpSpeed;
+	const float maxAllowableFactor = 1.5f; //Factor of jumpSpeed, prevents moving inside objects
 		
 	IloAudio audioController;
 	
@@ -80,10 +81,10 @@ public class IloController : MonoBehaviour {
 	void Update() {
 		switch(state) {
 			case (int)STATE.WALKING: Walk_Update(); break;
+			case (int)STATE.REFLECTING:
 			case (int)STATE.JUMPING: Jump_Update(); break;
 			case (int)STATE.JUMPING_FROM_WALL: break;
 			case (int)STATE.FALLING: Fall_Update(); break;
-			case (int)STATE.REFLECTING: Reflect_Update(); break;
 		}
 	}
 	
@@ -97,8 +98,8 @@ public class IloController : MonoBehaviour {
 		}
 	}
 	
-	public bool isJumping() {
-		return (state == (int)STATE.JUMPING);
+	public bool isAirborne() {
+		return (state != (int)STATE.WALKING);
 	}
 	
 	public bool isMoving() {
@@ -169,6 +170,10 @@ public class IloController : MonoBehaviour {
 	void Jump_Update() {
 		float input = GetInput();
 		rigidbody.velocity += input*transform.right.normalized;
+		float magnitude = rigidbody.velocity.magnitude;
+		if (magnitude > jumpSpeed * maxAllowableFactor){
+			rigidbody.velocity *= (jumpSpeed/magnitude) * maxAllowableFactor;
+		}
 		jumpVector = rigidbody.velocity;		
 	}
 	
@@ -200,9 +205,12 @@ public class IloController : MonoBehaviour {
 		float input = GetInput();
 		Vector3 inputDirection = input*transform.right.normalized;
 		rigidbody.velocity += inputDirection;
-			
+		float magnitude = rigidbody.velocity.magnitude;
 		if(rigidbody.velocity.magnitude < jumpSpeed) {
 			rigidbody.AddForce(-surfaceNormal.normalized*jumpSpeed, ForceMode.Acceleration);
+		}
+		else if (magnitude > jumpSpeed * maxAllowableFactor){
+			rigidbody.velocity *= (jumpSpeed/magnitude) * maxAllowableFactor;
 		}
 		jumpVector = rigidbody.velocity;		
 	}
@@ -241,13 +249,6 @@ public class IloController : MonoBehaviour {
 		transform.eulerAngles = new Vector3(0,0,transform.eulerAngles.z);
 		state = (int)STATE.REFLECTING;
 	}
-	
-	void Reflect_Update() {
-		float input = GetInput();
-		Vector3 inputDirection = input*transform.right.normalized;
-		rigidbody.velocity += inputDirection;
-		jumpVector = rigidbody.velocity;		
-	}	
 	
 	#endregion
 }
