@@ -15,6 +15,8 @@ public class IloController : MonoBehaviour {
 	public float runSpeed;
 	public float jumpSpeed;
 	const float maxAllowableFactor = 1.5f; //Factor of jumpSpeed, prevents moving inside objects
+	
+	int layerMask;
 		
 	IloAudio audioController;
 	
@@ -35,6 +37,9 @@ public class IloController : MonoBehaviour {
 	
 	void Start() {
 		audioController = GetComponent<IloAudio>();
+		layerMask = Physics.kDefaultRaycastLayers &
+					~(1 << LayerMask.NameToLayer("Smogsworth")) &
+					~(1 << LayerMask.NameToLayer("SmogsBounds"));
 	}
 
 	// Use this for initialization
@@ -116,7 +121,7 @@ public class IloController : MonoBehaviour {
 		float input = GetInput();
 						
 		RaycastHit hit;
-		if(Physics.Raycast(transform.position, -surfaceNormal, out hit, transform.localScale.y*2) &&
+		if(Physics.Raycast(transform.position, -surfaceNormal, out hit, transform.localScale.y*2, layerMask) &&
 			Vector3.Angle(surfaceNormal, hit.normal) < maxDescentAngle) 
 		{
 			surfaceNormal = hit.normal;
@@ -138,8 +143,8 @@ public class IloController : MonoBehaviour {
 	
 	void Walk_OnCollisionEnter(Collision collision) {
 		RaycastHit hit;
-		if(Physics.Raycast(transform.position, -transform.right, out hit, transform.localScale.y) ||
-			Physics.Raycast(transform.position, transform.right, out hit, transform.localScale.y)) {
+		if(Physics.Raycast(transform.position, -transform.right, out hit, transform.localScale.y, layerMask) ||
+			Physics.Raycast(transform.position, transform.right, out hit, transform.localScale.y, layerMask)) {
 			if(Vector3.Angle(hit.normal, surfaceNormal) < 60f) {
 				surfaceNormal = collision.contacts[0].normal;
 				transform.position = (hit.point + collision.contacts[0].point)/2 + surfaceNormal*transform.localScale.y*0.5f;
@@ -155,7 +160,7 @@ public class IloController : MonoBehaviour {
 		audioController.playClip((int)Audio.JUMP_BEGIN);
 		
 		Vector3 leanDirection = GetInput() * transform.right;
-		if(Physics.Raycast(transform.position, leanDirection, transform.localScale.y*0.5f)) {
+		if(Physics.Raycast(transform.position, leanDirection, transform.localScale.y*0.5f, layerMask)) {
 			jumpVector = surfaceNormal;
 			state = (int)STATE.JUMPING_FROM_WALL;
 		}
@@ -181,7 +186,7 @@ public class IloController : MonoBehaviour {
 		RaycastHit hit;
 		ContactPoint contact = collision.contacts[0];
 		if(Vector3.Angle(contact.normal, transform.up) >= minTransferAngle &&
-			Physics.Raycast(transform.position, (contact.point - transform.position), out hit)) 
+			Physics.Raycast(transform.position, (contact.point - transform.position), out hit, Mathf.Infinity, layerMask)) 
 		{
 			Vector3 contactNormal = hit.normal;
 			if(Vector3.Angle(surfaceNormal, contactNormal) > 150f) {
@@ -218,7 +223,7 @@ public class IloController : MonoBehaviour {
 	void Fall_OnCollisionEnter(Collision collision) {
 		RaycastHit hit;
 		ContactPoint contact = collision.contacts[0];
-		if(Physics.Raycast(transform.position, (contact.point - transform.position), out hit)) {
+		if(Physics.Raycast(transform.position, (contact.point - transform.position), out hit, Mathf.Infinity, layerMask)) {
 			Vector3 contactNormal = hit.normal;
 			if(Vector3.Angle(surfaceNormal, contactNormal) > 150f) {
 				reverseHorizontalInput = !reverseHorizontalInput;
