@@ -14,7 +14,7 @@ public class IloController : MonoBehaviour {
 	
 	public float runSpeed;
 	public float jumpSpeed;
-	const float maxAllowableFactor = 1.5f; //Factor of jumpSpeed, prevents moving inside objects
+	public float maxAllowableFactor; //Factor of jumpSpeed, prevents moving inside objects
 	
 	int layerMask;
 		
