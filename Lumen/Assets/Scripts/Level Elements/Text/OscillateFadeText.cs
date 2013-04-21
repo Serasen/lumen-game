@@ -41,7 +41,7 @@ public class OscillateFadeText : FadeText {
 			GUIInfo elem = guiInfos[activeText];
 			
 			style.fontSize = (int) (elem.fontSize/pixelRatio);
-			Vector3 screenPoint = mainCamera.WorldToScreenPoint(transform.position + new Vector3(elem.posX, elem.posY, 0));
+			Vector3 screenPoint = getScreenPoint(elem.posX, elem.posY);
 			guiRect = new Rect(screenPoint.x, Screen.height - (screenPoint.y), 0, 0);
 			GUI.Box(guiRect, elem.text, style);
 		}
