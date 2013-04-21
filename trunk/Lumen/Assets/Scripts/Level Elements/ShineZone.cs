@@ -45,6 +45,7 @@ public class ShineZone : MonoBehaviour {
 	
 	void OnDisable() {
 		StopAllCoroutines();
+		litup = true;
 		if(theLight != null)
 			theLight.intensity = startIntensity;
 	}
