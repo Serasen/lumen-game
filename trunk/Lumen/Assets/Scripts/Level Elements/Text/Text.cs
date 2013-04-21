@@ -19,7 +19,7 @@ public class Text : MonoBehaviour {
 	public GUIInfo[] guiInfos;
 	protected GUIStyle style;
 	
-	protected virtual void Start() {
+	protected void Start() {
 		style = new GUIStyle();	
 	}
 	
@@ -42,11 +42,16 @@ public class Text : MonoBehaviour {
 		
 			foreach(GUIInfo elem in guiInfos) {
 				style.fontSize = (int) (elem.fontSize/pixelRatio);
-				Vector3 screenPoint = mainCamera.WorldToScreenPoint(transform.position + new Vector3(elem.posX, elem.posY, 0));
+				Vector3 screenPoint = getScreenPoint(elem.posX, elem.posY);
 				guiRect = new Rect(screenPoint.x, Screen.height - (screenPoint.y), 0, 0);
 				GUI.Box(guiRect, elem.text, style);
 			}
 		}
+	}
+	
+	//Return screen point of target (in this case, text zone)
+	protected virtual Vector3 getScreenPoint(float x, float y) {
+		return mainCamera.WorldToScreenPoint(transform.position + new Vector3(x, y, 0));
 	}
 	
 	protected float getNowAlpha() {

@@ -18,11 +18,20 @@ public class Friend : MonoBehaviour {
 		text = GetComponent<FadeText>();
 		friendLight = transform.parent.GetComponentInChildren<Light>();
 		startRange = friendLight.range;
-		unhappy = !myLevel.getFriendStatus(transform.parent.name);
-		if(!unhappy) {
-			friendLight.range = maxRange;
-			text.enabled = true;
-			transform.parent.gameObject.renderer.material.SetTextureOffset("_MainTex", new Vector2(0,0));
+		OnEnable();
+	}
+	
+	void OnEnable() {
+		if(myLevel != null) {
+			unhappy = !myLevel.getFriendStatus(transform.parent.name);
+			if(!unhappy) {
+				friendLight.range = maxRange;
+				text.enabled = true;
+				transform.parent.gameObject.renderer.material.SetTextureOffset("_MainTex", new Vector2(0,0));
+			}
+			else {
+				friendLight.range = startRange;	
+			}
 		}
 	}
 	
