@@ -3,11 +3,10 @@ using System.Collections;
 
 public class DarkCrawler : MonoBehaviour {
 	private int direction = 0;
-	private int speed = 10, fallspeed = 10;
+	public int speed = 10, fallspeed = 10;
 	public bool midair = true;
-	private int waypoint = -1;
+	public int waypoint = -1;
 	private PathFinder pf;
-	private Transform lastWaypoint;
 	Room myRoom;
 	
 	// Use this for initialization
@@ -21,6 +20,7 @@ public class DarkCrawler : MonoBehaviour {
 			direction = 1;
 		else if(pf.GetIloAt() < waypoint)
 			direction = -1;
+		if(waypoint == -1) direction *= -1;
 		if(!midair)
 			rigidbody.velocity = direction*speed*transform.right;
 		else {
@@ -31,6 +31,7 @@ public class DarkCrawler : MonoBehaviour {
 	
 	void OnEnable() {
 		waypoint = -1;
+		midair = true;
 	}
 	
 	void OnCollisionEnter(Collision collision) {

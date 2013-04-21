@@ -3,7 +3,7 @@ using System.Collections;
 
 public class PathFinder : MonoBehaviour {
 	ArrayList waypoints = new ArrayList();
-	int iloAt = 5;
+	public int iloAt = 5;
 	
 	// Use this for initialization
 	void Start () {
