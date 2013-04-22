@@ -19,14 +19,22 @@ public class DataManager {
 	}
 	
 	public bool isLevelUnlocked(int level) {
-		bool isUnlocked = true;
+		bool isUnlocked = false;
 		/*
 		 * level 0 = hub
 		 * level 1 is automatically unlocked
 		 */
-		if(level >= gameData.levels.Length || 
-			(level > 1 && GetLevelData(level) == null))
-			isUnlocked = false;
+		if(level < gameData.levels.Length || level == 1) {
+			if(level == 1) {
+				isUnlocked = true;
+			}
+			else {
+				LevelData data = GetLevelData(level - 1);
+				if(data != null && data.GetNumSavedFriends() > 0) {
+					isUnlocked = true;
+				}
+			}
+		}
 		return isUnlocked;
 	}
 	

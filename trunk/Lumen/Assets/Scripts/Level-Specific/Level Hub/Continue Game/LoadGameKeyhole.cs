@@ -27,7 +27,7 @@ public class LoadGameKeyhole : Keyhole {
 			Game.instance.levelManager.initializeGameData();
 			Game.instance.dataManager.ChangeLevel(0);
 			Game.instance.levelManager.getCurrentLevel().initializeLevelData();
-			myRoom.keyholeReached(keyholeNum);
+			base.OnTriggerEnter(collider);
 		}
 	}
 	
