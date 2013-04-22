@@ -10,6 +10,7 @@ public class LevelStatsText : OscillateFadeText {
 		levelData = Game.instance.dataManager.GetLevelData(levelToDisplay);
 		alphaValue = 0f;
 		if(guiInfos.Length > 1 && levelData != null && levelData.rooms != null) {
+			//Debug.Log("level " + levelToDisplay + " , rooms:" + levelData.rooms.Length);
 			guiInfos[0].text = GetRoomProgress();
 			guiInfos[1].text = GetFriendProgress();
 			guiInfos[2].text = "Deaths: " + levelData.deaths;
@@ -39,7 +40,7 @@ public class LevelStatsText : OscillateFadeText {
 	
 	string GetFriendProgress() {
 		string progressString = "";
-		int reachedFriends = levelData.GetNumReachedRooms();
+		int reachedFriends = levelData.GetNumSavedFriends();
 		int totalFriends = levelData.friendsSaved.Length;
 		if(reachedFriends < totalFriends)
 			progressString = "Friends saved : " + reachedFriends + " of " + totalFriends;

@@ -66,17 +66,19 @@ public class Level : MonoBehaviour {
 	//Set all state variables and enter room
 	public void setCurrentRoom(int number, int spawnPoint) {
 		//change pointers
-		Game.instance.dataManager.ChangeRoom(number);
 		roomNumber = number;
+		Game.instance.dataManager.ChangeRoom(roomNumber);
 		roomBehavior = null;
-		if(roomInstances[roomNumber] == null) {
+		if(roomInstances[roomNumber] == null) {	
 			//Instantiate room
 			roomInstances[roomNumber] = (GameObject) GameObject.Instantiate(rooms[roomNumber].room);
 			roomInstances[roomNumber].transform.parent = transform;
 			roomInstances[roomNumber].SetActive(false);
 		}
 		currentRoom = roomInstances[roomNumber];
-		getCurrentRoom().enterRoom(spawnPoint);		
+		roomBehavior = null;
+		
+		getCurrentRoom().enterRoom(spawnPoint);
 	}
 	
 	#endregion
