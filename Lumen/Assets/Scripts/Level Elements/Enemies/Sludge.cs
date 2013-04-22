@@ -17,7 +17,6 @@ public class Sludge : MonoBehaviour {
 		if(collider.tag == "Player") {
 			collider.GetComponent<IloMeta>().DisableController(stickDuration);
 			audio.Play();
-			//collider.gameObject.transform.rotation = transform.rotation;
 		}
 	}
 	
