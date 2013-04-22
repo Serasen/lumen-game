@@ -176,9 +176,7 @@ public class IloController : MonoBehaviour {
 		float input = GetInput();
 		rigidbody.velocity += input*transform.right.normalized;
 		float magnitude = rigidbody.velocity.magnitude;
-		if (magnitude > jumpSpeed * maxAllowableFactor){
-			rigidbody.velocity *= (jumpSpeed/magnitude) * maxAllowableFactor;
-		}
+		rigidbody.velocity *= (jumpSpeed/magnitude);
 		jumpVector = rigidbody.velocity;		
 	}
 	
