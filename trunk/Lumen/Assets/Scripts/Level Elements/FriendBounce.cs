@@ -22,6 +22,8 @@ public class FriendBounce : MonoBehaviour {
 		}
 		else {
 			transform.position = startPos;
+			rigidbody.velocity = Vector3.zero;
+			rigidbody.Sleep();
 		}
 	}
 	
