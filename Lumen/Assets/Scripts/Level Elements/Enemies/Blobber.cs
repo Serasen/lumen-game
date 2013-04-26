@@ -8,13 +8,7 @@ public class Blobber : MonoBehaviour {
 	public float speed;
 	public float jumpPeriod;
 	public GameObject sludge;
-	private float sludgeHeight;
-	private float myHeight;
 	
-	void Start () {
-		sludgeHeight = sludge.transform.localScale.y;
-		myHeight = transform.localScale.y;
-	}
 	void OnCollisionEnter(Collision collision) {
 		if(collision.gameObject.tag == "Player") {
 			collision.gameObject.transform.GetComponentInChildren<Light>().range = 0;
@@ -49,7 +43,7 @@ public class Blobber : MonoBehaviour {
 		else if(dir == RIGHT) {
 			rigidbody.velocity = (transform.up + transform.right*Random.Range(minAngle,maxAngle))*speed;
 		}
-		GameObject blackhole = (GameObject) GameObject.Instantiate(sludge, transform.position /*- transform.up*(myHeight/2-sludgeHeight/2)*/, transform.rotation);
+		GameObject blackhole = (GameObject) GameObject.Instantiate(sludge, transform.position, transform.rotation);
 		blackhole.transform.parent = transform.parent;
 	}
 }
