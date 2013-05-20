@@ -6,6 +6,8 @@ public class Smogsworth : MonoBehaviour {
 	public float directionChangeInterval;
 	public float smogAttackDuration;
 	private Vector3 randomDir = new Vector3();
+	private Vector3 shineZonePos;
+	private Vector3 startPos;
 	
 	// Use this for initialization
 	void OnEnable () {
@@ -24,9 +26,11 @@ public class Smogsworth : MonoBehaviour {
 		rigidbody.velocity = Vector3.Reflect(rigidbody.velocity,c.contacts[0].normal).normalized*speed;
 	}
 	
-	public void SmogAttack() {
-		//StopAllCoroutines();
-		//rigidbody.velocity = Vector3.zero;
+	public void SmogAttack(Vector3 pos) {
+		StopAllCoroutines();
+		rigidbody.velocity = Vector3.zero;
+		shineZonePos = pos;
+		startPos = transform.position;
 		StartCoroutine("SmogItUp");
 	}
 	
@@ -47,9 +51,25 @@ public class Smogsworth : MonoBehaviour {
 		StartCoroutine("MoveAbout");
 	}
 	IEnumerator SmogItUp() {
-		renderer.enabled = false;
-		yield return new WaitForSeconds(smogAttackDuration);
-		renderer.enabled = true;
+		int iterations = 100;
+		Vector3 diff = shineZonePos - startPos;
+		Color color = renderer.material.color;
+		collider.isTrigger = true;
+		for(int i = 0; i < iterations; i++) {
+			transform.position += diff/iterations;
+			color.a -= 1.0f/iterations;
+			renderer.material.color = color;
+			transform.localScale *= 1.01f;
+			yield return new WaitForSeconds(.02f);
+		}
+		yield return new WaitForSeconds(smogAttackDuration - 0.02f * iterations);
+		for(int i = 0; i < iterations; i++) {
+			color.a += 1.0f/iterations;
+			renderer.material.color = color;
+			transform.localScale /= 1.01f;
+			yield return new WaitForSeconds(.02f);
+		}
+		collider.isTrigger = false;
 		rigidbody.velocity = RandomDir();
 		StartCoroutine("MoveAbout");
 	}

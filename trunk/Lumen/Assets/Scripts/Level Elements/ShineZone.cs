@@ -31,6 +31,7 @@ public class ShineZone : MonoBehaviour {
 			smogs.StopAllCoroutines();
 			smogs.rigidbody.velocity = Vector3.zero;
 			blackoutDuration = smogs.smogAttackDuration;
+			smogs.SmogAttack(transform.position);
 			StartCoroutine("FadeDark");
 		}
 	}
@@ -61,7 +62,7 @@ public class ShineZone : MonoBehaviour {
 	}
 	
 	IEnumerator Blackout() {
-		smogs.SmogAttack();
+		//smogs.SmogAttack();
 		if(ilo != null) {
 			ilo.GetComponent<IloShine>().EndFadeLight();
 		}
