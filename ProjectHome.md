@@ -1,0 +1,1 @@
+Surface-based 2D platformer in which the player controls a ball of light.
